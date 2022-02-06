@@ -16,7 +16,7 @@ int main(void) {
     const int startX = 50;
     const int statY = screenHeight - 50;
 
-    //Initialazing Main Matrix
+    //Initializing Main Matrix
     //--------------------------------------------------------------------------------------------------|
     const int size = 55;
     int* mat = GenerateMat(size, max, min); 
@@ -31,7 +31,7 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     float currentTime = 0;
     float deltaTime = 0.f;
-    float timeInterval = 0.0125f;
+    float timeInterval = 0.005f;
 
     //Selection Sort Variables
     //--------------------------------------------------------------------------------------------------|
@@ -41,9 +41,9 @@ int main(void) {
     bool flag = true;
     bool BeginSelectionSort = false;
 
-    //Initialazing Screen
+    //Initializing Screen
     //--------------------------------------------------------------------------------------------------|
-    SetTargetFPS(30);
+    SetTargetFPS(60);
     InitWindow(screenWidth, screenHeight, "HereWeGo");
 
 
@@ -71,7 +71,7 @@ int main(void) {
 	    }	
 	}
 
-	//Ensure Time Interval and Make One Sort Step per timeInterval
+	//Ensure Time Interval and Make One Sort-Step per timeInterval
 	//----------------------------------------------------------------------------------------------|	
 	if(currentTime < 0.01f) currentTime = GetTime();
 	deltaTime = GetTime() - currentTime;
@@ -128,7 +128,7 @@ int main(void) {
 	EndDrawing();
     }
 
-    //Free Space and De-Initialaze Screen
+    //Free Space and De-Initialize Screen
     FreeSpace(mat, boxes, size);
 
     CloseWindow();

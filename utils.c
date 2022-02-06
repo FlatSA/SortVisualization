@@ -3,16 +3,8 @@
 #include<stdlib.h>
 #include"utils.h"
 
-void Swap(Rectangle* rec1, Rectangle* rec2) {
-	int flag = rec1->height;
-	rec1->height = rec2->height;
-	rec2->height = flag;
-
-	flag = rec1->y;
-	rec1->y = rec2->y;
-	rec2->y = flag;
-}
-
+//Initializing and De-Initializing Functions for Matrix
+//------------------------------------------------------------------------------------------------------|
 int* GenerateMat(int size, int max, int min) {
 	srand(time(0));
 	int* mat = malloc(size * sizeof(int));        
@@ -43,10 +35,24 @@ void FreeSpace(int* mat, struct Rectangle** boxes, int size) {
 	free(boxes);
 }
 
+//Functions For Drawing on Screen
+//------------------------------------------------------------------------------------------------------|
 void DrawOutLine(int index, Color color, int edge, struct Rectangle** boxes) {
 	int posX = boxes[index]->x - edge;
 	int posY = boxes[index]->y /* - edge */;
 	int width = boxes[index]->width + edge*2;
 	int height = boxes[index]->height + edge*1 /* *2 */;
 	DrawRectangle(posX, posY, width, height, color);
+}
+
+//SortRelated Functions and Enum
+//------------------------------------------------------------------------------------------------------|
+void Swap(Rectangle* rec1, Rectangle* rec2) {
+	int flag = rec1->height;
+	rec1->height = rec2->height;
+	rec2->height = flag;
+
+	flag = rec1->y;
+	rec1->y = rec2->y;
+	rec2->y = flag;
 }

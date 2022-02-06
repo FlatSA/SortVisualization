@@ -1,23 +1,22 @@
-#ifndef SANEK_UTILS 
-#define SANEK_UTILS 
+#ifndef FLATSA_UTILS 
+#define FLATSA_UTILS 
 
 #include<raylib.h>
 
-/********** Functions for initialazing variables **************/
-
+//Initializing and De-Initializing Functions for Matrix
+//------------------------------------------------------------------------------------------------------|
 int* GenerateMat(int size, int max, int min);
 
 struct Rectangle** GenerateBoxes(int size, int* mat, int width, int shift, int hPar, int sX, int sY);
 
 void FreeSpace(int* mat, struct Rectangle** boxes, int size);
 
-/*************************************************************/
-
-/*Should be used ONLY in Draw Section*/
+//Functions For Drawing on Screen
+//------------------------------------------------------------------------------------------------------|
 void DrawOutLine(int index, Color color, int edge, struct Rectangle** boxes);
 
-/********* Sort related functions and enum ******************/
-
+//SortRelated Functions and Enum
+//------------------------------------------------------------------------------------------------------|
 enum SortType {
 	SelectionSort = 10,
 };
