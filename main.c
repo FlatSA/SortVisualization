@@ -2,6 +2,7 @@
 #include"utils.h"
 #include<stdbool.h>
 
+
 int main(void) {
 
     //Screen Related Variables
@@ -31,13 +32,14 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     float currentTime = 0;
     float deltaTime = 0.f;
-    float timeInterval = 0.005f;
+    float timeInterval = 0.5f;
 
+   
     //Selection Sort Variables
     //--------------------------------------------------------------------------------------------------|
     int iterator = 0;
     int startPoint = 0;
-    int currentTarget = startPoint;
+    int currentTarget = 0;
     bool flag = true;
     bool BeginSelectionSort = false;
 
