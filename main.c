@@ -11,7 +11,7 @@ int main(void) {
     const int screenHeight = 700;
     const int max = 190;
     const int min = 5;
-    const int unitWidth = 80;
+    const int unitWidth = 30;
     const int shift = 5;
     const int heightPar = 3;
     const int startX = 50;
@@ -19,7 +19,7 @@ int main(void) {
 
     //Initializing Main Matrix
     //--------------------------------------------------------------------------------------------------|
-    const int size = 13;
+    const int size = 32;
     int* mat = GenerateMat(size, max, min); 
     struct Rectangle** boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, statY);
 
@@ -32,7 +32,7 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     double currentTime = 0;
     double deltaTime = 0.f;
-    double timeInterval = 0.350f;
+    double timeInterval = 0.025f;
 
     //Common Sort Variables
     //--------------------------------------------------------------------------------------------------|
@@ -113,6 +113,7 @@ int main(void) {
 			iterator = 0;
 			currentTarget = 0;
 			Input = 0;
+			flag = true;
 		    } else if(boxes[iterator]->height < boxes[currentTarget]->height) {
 			currentTarget = iterator;
 			flag = true;

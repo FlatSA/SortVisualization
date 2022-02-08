@@ -45,9 +45,10 @@ void DrawOutLine(int index, Color color, int edge, struct Rectangle** boxes) {
 	DrawRectangle(posX, posY, width, height, color);
 }
 
-//SortRelated Functions and Enum
+//SortRelated Functions
 //------------------------------------------------------------------------------------------------------|
 void Swap(Rectangle* rec1, Rectangle* rec2) {
+	if(rec1 == rec2) return;
 	int flag = rec1->height;
 	rec1->height = rec2->height;
 	rec2->height = flag;
