@@ -144,7 +144,7 @@ int main(void) {
 				}
 			    }
 
-			if(counter == size) {
+			if(counter == size - 1) {
 			    BeginBubbleSort = false;
 			    iterate = true;
 			    SortType = 0;
