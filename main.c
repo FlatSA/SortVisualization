@@ -172,7 +172,7 @@ int main(void) {
 	   
 	    //Selection Sort Draw Section 
 	    if(BeginSelectionSort) {
-		if(flag) DrawOutLine(currentTarget, ORANGE, 1, boxes);
+		if(flag) DrawOutLine(currentTarget, RAYWHITE, 1, boxes);
 		DrawOutLine(iterator, RAYWHITE, 1, boxes);
 		DrawOutLine(startPoint, GREEN, 1, boxes);
 	    }
@@ -181,7 +181,7 @@ int main(void) {
 	    if(BeginBubbleSort) {
 		DrawOutLine(iterator, RAYWHITE, 1, boxes);
 		DrawOutLine(currentTarget, RAYWHITE, 1, boxes);
-		if(counter != 0) DrawOutLine(size - counter, GREEN, 1, boxes);
+		if(counter != 0) DrawOutLine(size - counter - 1, GREEN, 1, boxes);
 		iterate = true;
 	    }
 	 
