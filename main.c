@@ -11,7 +11,7 @@ int main(void) {
     const int screenHeight = 700;
     const int max = 190;
     const int min = 5;
-    const int unitWidth = 30;
+    const int unitWidth = 60;
     const int shift = 5;
     const int heightPar = 3;
     const int startX = 50;
@@ -19,7 +19,7 @@ int main(void) {
 
     //Initializing Main Matrix
     //--------------------------------------------------------------------------------------------------|
-    const int size = 32;
+    const int size = 17;
     int* mat = GenerateMat(size, max, min); 
     struct Rectangle** boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, statY);
 
@@ -32,28 +32,27 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     double currentTime = 0;
     double deltaTime = 0.f;
-    double timeInterval = 0.025f;
+    double timeInterval = 0.350f;
 
     //Common Sort Variables
     //--------------------------------------------------------------------------------------------------|
     int iterator = 0;
     int startPoint = 0;
     int currentTarget = 0;
+    bool iterate = true;
 
     //Selection Sort Variables
     //--------------------------------------------------------------------------------------------------|
-    bool flag = true;
     bool BeginSelectionSort = false;
 
     //Bubble Sort Variables
     //--------------------------------------------------------------------------------------------------|
     bool BeginBubbleSort = false;
-    bool iterate = true;
     int counter = 0;
 
     //Initializing Screen
     //--------------------------------------------------------------------------------------------------|
-    SetTargetFPS(60);
+    SetTargetFPS(120);
     InitWindow(screenWidth, screenHeight, "HereWeGo");
 
 
@@ -93,37 +92,48 @@ int main(void) {
 	if((deltaTime > timeInterval) && Input) {
 		currentTime = GetTime();
 		
-		//SelectionSort
+		//SelectionSort per Time Interval
 		//--------------------------------------------------------------------------------------|
 		if(SortType == SelectionSort) {
-		    if(startPoint == 0) BeginSelectionSort = true;	
-		    if(iterator < size - 1) {
+		    if(!iterate) {
 			iterator++;
-			if(currentTarget == startPoint) flag = false;
-		    } else {			    
-			if(currentTarget != startPoint) Swap(boxes[currentTarget], boxes[startPoint]);
-			startPoint++;
-			iterator = startPoint + 1;
-			currentTarget = startPoint;
+			iterate = true;
 		    }
-		    if(startPoint == size - 1) {
-			BeginSelectionSort = false;
-			SortType = 0;
-			startPoint = 0;
-			iterator = 0;
-			currentTarget = 0;
-			Input = 0;
-			flag = true;
-		    } else if(boxes[iterator]->height < boxes[currentTarget]->height) {
-			currentTarget = iterator;
-			flag = true;
+		    if(iterator == size-1 && currentTarget != startPoint) {
+			Swap(boxes[currentTarget], boxes[startPoint]);
+			iterate = false;
 		    }
+		    if(iterate) {
+			if(startPoint == 0) {
+			    BeginSelectionSort = true;
+			}	
+			if(iterator < size -1) {
+			    iterator++;
+			} else {
+			    startPoint++;
+			    currentTarget = startPoint;
+			    iterator = startPoint + 1;
+			}
+			if(startPoint == size - 1) {
+			    BeginSelectionSort = false;
+			    SortType = 0;
+			    iterate = true;
+			    iterator = 0;
+			    currentTarget = 0;
+			    startPoint = 0;
+			    Input = 0;
+			}
+			if(boxes[currentTarget]->height > boxes[iterator]->height) {
+			    currentTarget = iterator;
+			}
+		    }
+		   
 		}
 
-		//BubbleSort
+		//BubbleSort per Time Interval
 		//--------------------------------------------------------------------------------------|
 		if(SortType == BubbleSort) {
-		    
+		    iterate = true; 
 		    if(boxes[iterator]->height < boxes[currentTarget]->height) {
 			Swap(boxes[iterator], boxes[currentTarget]);
 			iterate = false;
@@ -172,17 +182,21 @@ int main(void) {
 	   
 	    //Selection Sort Draw Section 
 	    if(BeginSelectionSort) {
-		if(flag) DrawOutLine(currentTarget, RAYWHITE, 1, boxes);
-		DrawOutLine(iterator, RAYWHITE, 1, boxes);
+		if(iterator != size - 1) {
+		    DrawOutLine(currentTarget, ORANGE, 1, boxes);
+		    DrawOutLine(iterator, RAYWHITE, 1, boxes);
+		} else {
+		    DrawOutLine(iterator, RAYWHITE, 1, boxes);
+		    DrawOutLine(currentTarget, ORANGE, 1, boxes);
+		}
 		DrawOutLine(startPoint, GREEN, 1, boxes);
 	    }
 
 	    //Bubble Sort Draw Section
 	    if(BeginBubbleSort) {
+		if(counter != 0) DrawOutLine(size - counter - 1, GREEN, 1, boxes);
 		DrawOutLine(iterator, RAYWHITE, 1, boxes);
 		DrawOutLine(currentTarget, RAYWHITE, 1, boxes);
-		if(counter != 0) DrawOutLine(size - counter - 1, GREEN, 1, boxes);
-		iterate = true;
 	    }
 	 
 	EndDrawing();
