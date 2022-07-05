@@ -11,15 +11,15 @@ int main(void) {
     const int screenHeight = 700;
     const int max = 190;
     const int min = 5;
-    const int unitWidth = 15;
-    const int shift = 3;
+    const int unitWidth = 9;
+    const int shift = 2;
     const int heightPar = 3;
     const int startX = 50;
     const int statY = screenHeight - 50;
 
     //Initializing Main Matrix
     //--------------------------------------------------------------------------------------------------|
-    const int size = 60;
+    const int size = 100;
     int* mat = GenerateMat(size, max, min); 
     struct Rectangle** boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, statY);
 
@@ -32,7 +32,7 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     double currentTime = 0;
     double deltaTime = 0.f;
-    double timeInterval = 0.000f;
+    double timeInterval = 0.0f;
 
     //Common Sort Variables
     //--------------------------------------------------------------------------------------------------|
@@ -246,10 +246,12 @@ int main(void) {
 
 	    //InsertionSort 
 	    if(BeginInsertionSort) {
-		DrawOutLine(startPoint, GREEN, 1, boxes);
 		if(currentTarget != size)
-		    DrawOutLine(currentTarget, ORANGE, 1, boxes);
+		    DrawOutLine(currentTarget, RAYWHITE, 1, boxes);
 		DrawOutLine(iterator, RAYWHITE, 1, boxes);
+		if(startPoint < size - 1) 
+		    DrawOutLine(startPoint + 1, GREEN, 1, boxes);
+		
 	    }
 	 
 	EndDrawing();
