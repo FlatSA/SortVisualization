@@ -14,6 +14,25 @@ int* GenerateMat(int size, int max, int min) {
 	return mat;
 }
 
+int* GenerateTriangleMat(int size, int gap) {
+	srand(time(0));
+	int* mat = malloc(size * sizeof(int));
+	for(int i = 1; i < size + 1; i++) {
+		mat[i - 1] = i * gap; 
+	}
+	int j;
+	int swapFlag;
+	for(int i = 0; i < size; i++) {
+		j = (rand()%(size));
+		if(j != i) {
+			swapFlag = mat[j]; 
+			mat[j] = mat[i];
+			mat[i] = swapFlag;
+		}
+	}	
+	return mat;
+ }
+
 struct Rectangle** GenerateBoxes(int size, int*mat, int width, int shift, int hPar, int sX, int sY) {
 	struct Rectangle** boxes = malloc(size * sizeof(Rectangle*));
 	for(int i = 0; i < size; i++) {

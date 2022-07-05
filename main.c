@@ -12,12 +12,13 @@ static const int unitWidth = 18;
 static const int shift = 3;
 static const int heightPar = 2;
 static const int startX = 50;
-static const int statY = screenHeight - 50;
+static const int startY = screenHeight - 50;
 static const int unitGap = 0;
+static const int triangleGap = 5;
 
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
-static const int size = 52;
+static const int size = 53;
 static int* mat; 
 static struct Rectangle** boxes;
 
@@ -61,8 +62,8 @@ int main(void) {
 
     //Initializing Main MAtrix
     //--------------------------------------------------------------------------------------------------|
-    mat = GenerateMat(size, max, min); 
-    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, statY);
+    mat = GenerateTriangleMat(size, triangleGap); 
+    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
   
     //Initializing Screen
     //--------------------------------------------------------------------------------------------------|
@@ -83,7 +84,13 @@ int main(void) {
 		case KEY_N:
 		    FreeSpace(mat, boxes, size);
 		    mat = GenerateMat(size, max, min);
-		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, statY);
+		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		    Input = 0;
+		    break;
+		case KEY_T: 
+		    FreeSpace(mat, boxes, size);
+		    mat = GenerateTriangleMat(size, triangleGap); 
+		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
 		    Input = 0;
 		    break;
 		//Begin Selection Sort    
