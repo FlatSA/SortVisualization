@@ -2,59 +2,68 @@
 #include"utils.h"
 #include<stdbool.h>
 
+//Screen Related Variables
+//--------------------------------------------------------------------------------------------------|
+static const int screenWidth = 1200;
+static const int screenHeight = 700;
+static const int max = 290;
+static const int min = 5;
+static const int unitWidth = 18;
+static const int shift = 3;
+static const int heightPar = 2;
+static const int startX = 50;
+static const int statY = screenHeight - 50;
+static const int unitGap = 0;
+
+//Initializing Main Matrix
+//--------------------------------------------------------------------------------------------------|
+static const int size = 52;
+static int* mat; 
+static struct Rectangle** boxes;
+
+//Input Variables
+//--------------------------------------------------------------------------------------------------|
+static int Input = 0;
+static int SortType = none;
+
+//Time Interval Variables
+//--------------------------------------------------------------------------------------------------|
+static double currentTime = 0;
+static double deltaTime = 0.f;
+static double timeInterval = 0.0f;
+
+//Common Sort Variables
+//--------------------------------------------------------------------------------------------------|
+static int iterator = 0;
+static int startPoint = 0;
+static int currentTarget = 0;
+static bool iterate = true;
+
+//Selection Sort Variables
+//--------------------------------------------------------------------------------------------------|
+static bool BeginSelectionSort = false;
+
+//Bubble Sort Variables
+//--------------------------------------------------------------------------------------------------|
+static bool BeginBubbleSort = false;
+static bool InitStart = false;
+static int counter = 0;
+    
+//InsertionSort Sort Variables
+//--------------------------------------------------------------------------------------------------|
+static bool BeginInsertionSort = false;
+static bool endCycle = false;
+
+//Common Sort Variables Reset Function 
+static void Reset();
 
 int main(void) {
 
-    //Screen Related Variables
+    //Initializing Main MAtrix
     //--------------------------------------------------------------------------------------------------|
-    const int screenWidth = 1200;
-    const int screenHeight = 700;
-    const int max = 190;
-    const int min = 5;
-    const int unitWidth = 9;
-    const int shift = 2;
-    const int heightPar = 3;
-    const int startX = 50;
-    const int statY = screenHeight - 50;
-
-    //Initializing Main Matrix
-    //--------------------------------------------------------------------------------------------------|
-    const int size = 100;
-    int* mat = GenerateMat(size, max, min); 
-    struct Rectangle** boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, statY);
-
-    //Input Variables
-    //--------------------------------------------------------------------------------------------------|
-    int Input = 0;
-    int SortType = 0;
-
-    //Time Interval Variables
-    //--------------------------------------------------------------------------------------------------|
-    double currentTime = 0;
-    double deltaTime = 0.f;
-    double timeInterval = 0.0f;
-
-    //Common Sort Variables
-    //--------------------------------------------------------------------------------------------------|
-    int iterator = 0;
-    int startPoint = 0;
-    int currentTarget = 0;
-    bool iterate = true;
-
-    //Selection Sort Variables
-    //--------------------------------------------------------------------------------------------------|
-    bool BeginSelectionSort = false;
-
-    //Bubble Sort Variables
-    //--------------------------------------------------------------------------------------------------|
-    bool BeginBubbleSort = false;
-    int counter = 0;
-    
-    //InsertionSort Sort Variables
-    //--------------------------------------------------------------------------------------------------|
-    bool BeginInsertionSort = false;
-    bool endCycle = false;
-
+    mat = GenerateMat(size, max, min); 
+    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, statY);
+  
     //Initializing Screen
     //--------------------------------------------------------------------------------------------------|
     SetTargetFPS(144);
@@ -80,9 +89,13 @@ int main(void) {
 		//Begin Selection Sort    
 		case KEY_S:
 		    SortType = SelectionSort;
+		    BeginSelectionSort = true;
 		    break;
 		case KEY_B:
 		    SortType = BubbleSort;
+		    BeginBubbleSort = true;
+		    startPoint++;
+		    iterator++;
 		    break;
 		case KEY_I:
 		    SortType = InsertionSort; 
@@ -114,9 +127,6 @@ int main(void) {
 			iterate = false;
 		    }
 		    if(iterate) {
-			if(startPoint == 0) {
-			    BeginSelectionSort = true;
-			}	
 			if(iterator < size -1) {
 			    iterator++;
 			} else {
@@ -126,53 +136,38 @@ int main(void) {
 			}
 			if(startPoint == size - 1) {
 			    BeginSelectionSort = false;
-			    SortType = none;
-			    iterate = true;
-			    iterator = 0;
-			    currentTarget = 0;
-			    startPoint = 0;
-			    Input = 0;
+			    Reset();
 			}
 			if(boxes[currentTarget]->height > boxes[iterator]->height) {
 			    currentTarget = iterator;
 			}
+			
 		    }
 		   
 		}
 
 		//BubbleSort per Time Interval
 		//--------------------------------------------------------------------------------------|
-		if(SortType == BubbleSort) {
+		if(SortType == BubbleSort && InitStart) {
 		    iterate = true; 
 		    if(boxes[iterator]->height < boxes[currentTarget]->height) {
 			Swap(boxes[iterator], boxes[currentTarget]);
 			iterate = false;
 		    }
 		    if(iterate) {
-			if(startPoint == 0) {
-			    BeginBubbleSort = true;	
+			if(iterator < size - 1 - counter) { 
 			    iterator++;
-			    startPoint++;
-			    } else {
-				if(iterator < size - 1 - counter) { 
-				    iterator++;
-				    currentTarget++; 
-				} else {
-				    currentTarget = 0;
-				    iterator = startPoint;
-				    counter++;
-				}
-			    }
+			    currentTarget++; 
+			} else {
+			    currentTarget = 0;
+			    iterator = startPoint;
+			    counter++;
+			}
 
 			if(counter == size - 1) {
 			    BeginBubbleSort = false;
-			    iterate = true;
-			    SortType = none;
-			    iterator = 0;
-			    startPoint = 0;
-			    currentTarget = 0;
 			    counter = 0;
-			    Input = 0;
+			    Reset();
 			}
 		    }
 		   
@@ -204,12 +199,8 @@ int main(void) {
 			}
 			if(startPoint == size - 1) {
 			    BeginInsertionSort = false;
-			    SortType = none;
-			    iterator = 0;
-			    startPoint = 0;
-			    currentTarget = 0;
-			    counter = 0;
-			    Input = 0;
+			    endCycle = false; 
+			    Reset();
 			}
 		}
 	}
@@ -228,33 +219,33 @@ int main(void) {
 	    //Selection Sort Draw Section 
 	    if(BeginSelectionSort) {
 		if(iterator != size - 1) {
-		    if(size >= 50 && timeInterval < 0.2 && unitWidth < 15) { 
-		   	DrawOutLine(iterator - 1, RAYWHITE, 1, boxes); 
+		    if(timeInterval < 0.15) { 
+		   	DrawOutLine(iterator - 1, RAYWHITE, unitGap, boxes); 
 		    }
-
-		    DrawOutLine(currentTarget, ORANGE, 1, boxes);
-		    DrawOutLine(iterator, RAYWHITE, 1, boxes);
+		    DrawOutLine(currentTarget, ORANGE, unitGap, boxes);
+		    DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
 		} else {
-		    DrawOutLine(iterator, RAYWHITE, 1, boxes);
-		    DrawOutLine(currentTarget, ORANGE, 1, boxes);
+		    DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
+		    DrawOutLine(currentTarget, ORANGE, unitGap, boxes);
 		}
-		DrawOutLine(startPoint, GREEN, 1, boxes);
+		DrawOutLine(startPoint, GREEN, unitGap, boxes);
 	    }
 
 	    //Bubble Sort Draw Section
 	    if(BeginBubbleSort) {
-		if(counter != 0) DrawOutLine(size - counter - 1, GREEN, 1, boxes);
-		DrawOutLine(iterator, RAYWHITE, 1, boxes);
-		DrawOutLine(currentTarget, RAYWHITE, 1, boxes);
+		InitStart = true;
+		if(counter != 0) DrawOutLine(size - counter - 1, GREEN, unitGap, boxes);
+		DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
+		DrawOutLine(currentTarget, RAYWHITE, unitGap, boxes);
 	    }
 
 	    //InsertionSort 
 	    if(BeginInsertionSort) {
 		if(currentTarget != size)
-		    DrawOutLine(currentTarget, RAYWHITE, 1, boxes);
-		DrawOutLine(iterator, RAYWHITE, 1, boxes);
+		    DrawOutLine(currentTarget, RAYWHITE, unitGap, boxes);
+		DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
 		if(startPoint < size - 1) 
-		    DrawOutLine(startPoint + 1, GREEN, 1, boxes);
+		    DrawOutLine(startPoint + 1, GREEN, unitGap, boxes);
 		
 	    }
 	 
@@ -267,4 +258,13 @@ int main(void) {
     CloseWindow();
     
     return 0;
+}
+
+static void Reset() {
+    Input = 0;
+    SortType = none;
+    startPoint = 0; 
+    currentTarget = 0;
+    iterator = 0;
+    iterate = true;
 }
