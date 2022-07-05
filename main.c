@@ -8,17 +8,17 @@ static const int screenWidth = 1200;
 static const int screenHeight = 700;
 static const int max = 290;
 static const int min = 5;
-static const int unitWidth = 18;
+static const int unitWidth = 50;
 static const int shift = 3;
 static const int heightPar = 2;
 static const int startX = 50;
 static const int startY = screenHeight - 50;
 static const int unitGap = 0;
-static const int triangleGap = 5;
+static const int triangleGap = 12;
 
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
-static const int size = 53;
+static const int size = 20;
 static int* mat; 
 static struct Rectangle** boxes;
 
@@ -31,7 +31,7 @@ static int SortType = none;
 //--------------------------------------------------------------------------------------------------|
 static double currentTime = 0;
 static double deltaTime = 0.f;
-static double timeInterval = 0.0f;
+static double timeInterval = 0.15;
 
 //Common Sort Variables
 //--------------------------------------------------------------------------------------------------|
@@ -39,6 +39,7 @@ static int iterator = 0;
 static int startPoint = 0;
 static int currentTarget = 0;
 static bool iterate = true;
+static bool elivateSort = false;
 
 //Selection Sort Variables
 //--------------------------------------------------------------------------------------------------|
@@ -47,7 +48,6 @@ static bool BeginSelectionSort = false;
 //Bubble Sort Variables
 //--------------------------------------------------------------------------------------------------|
 static bool BeginBubbleSort = false;
-static bool InitStart = false;
 static int counter = 0;
     
 //InsertionSort Sort Variables
@@ -72,7 +72,7 @@ int main(void) {
 
 
     while(!WindowShouldClose()) {
-	
+
 	//Input Section
 	//----------------------------------------------------------------------------------------------|
 	if(Input == 0) {
@@ -113,6 +113,10 @@ int main(void) {
 		    Input = 0;
 	    }	
 	}
+	
+	//To stop current Sort (should check documentation)
+	if(GetKeyPressed() == KEY_Q) 
+		Reset();
 
 	//Ensure Time Interval and Make One Sort-Step per timeInterval
 	//----------------------------------------------------------------------------------------------|	
@@ -141,10 +145,8 @@ int main(void) {
 			    currentTarget = startPoint;
 			    iterator = startPoint + 1;
 			}
-			if(startPoint == size - 1) {
-			    BeginSelectionSort = false;
+			if(startPoint == size - 1) 
 			    Reset();
-			}
 			if(boxes[currentTarget]->height > boxes[iterator]->height) {
 			    currentTarget = iterator;
 			}
@@ -155,7 +157,7 @@ int main(void) {
 
 		//BubbleSort per Time Interval
 		//--------------------------------------------------------------------------------------|
-		if(SortType == BubbleSort && InitStart) {
+		if(SortType == BubbleSort && elivateSort) {
 		    iterate = true; 
 		    if(boxes[iterator]->height < boxes[currentTarget]->height) {
 			Swap(boxes[iterator], boxes[currentTarget]);
@@ -172,8 +174,6 @@ int main(void) {
 			}
 
 			if(counter == size - 1) {
-			    BeginBubbleSort = false;
-			    counter = 0;
 			    Reset();
 			}
 		    }
@@ -182,7 +182,7 @@ int main(void) {
 
 		//InsertionSort per Time Interval
 		//--------------------------------------------------------------------------------------|
-		if(SortType == InsertionSort) {
+		if(SortType == InsertionSort && elivateSort) {
 			iterate = true;
 			if(boxes[currentTarget]->height < boxes[iterator]->height){ 
 			    Swap(boxes[iterator], boxes[currentTarget]); 
@@ -205,8 +205,6 @@ int main(void) {
 			    endCycle = true;
 			}
 			if(startPoint == size - 1) {
-			    BeginInsertionSort = false;
-			    endCycle = false; 
 			    Reset();
 			}
 		}
@@ -226,7 +224,7 @@ int main(void) {
 	    //Selection Sort Draw Section 
 	    if(BeginSelectionSort) {
 		if(iterator != size - 1) {
-		    if(timeInterval < 0.15) { 
+		    if(timeInterval < 0.15 && size >= 35) { 
 		   	DrawOutLine(iterator - 1, RAYWHITE, unitGap, boxes); 
 		    }
 		    DrawOutLine(currentTarget, ORANGE, unitGap, boxes);
@@ -240,7 +238,7 @@ int main(void) {
 
 	    //Bubble Sort Draw Section
 	    if(BeginBubbleSort) {
-		InitStart = true;
+		elivateSort = true;
 		if(counter != 0) DrawOutLine(size - counter - 1, GREEN, unitGap, boxes);
 		DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
 		DrawOutLine(currentTarget, RAYWHITE, unitGap, boxes);
@@ -248,6 +246,7 @@ int main(void) {
 
 	    //InsertionSort 
 	    if(BeginInsertionSort) {
+		elivateSort = true;
 		if(currentTarget != size)
 		    DrawOutLine(currentTarget, RAYWHITE, unitGap, boxes);
 		DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
@@ -274,4 +273,10 @@ static void Reset() {
     currentTarget = 0;
     iterator = 0;
     iterate = true;
+    elivateSort = false;
+    BeginSelectionSort = false;
+    BeginBubbleSort = false;
+    BeginInsertionSort = false;
+    counter = 0;
+    endCycle = false;
 }
