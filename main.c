@@ -11,15 +11,15 @@ int main(void) {
     const int screenHeight = 700;
     const int max = 190;
     const int min = 5;
-    const int unitWidth = 60;
-    const int shift = 5;
+    const int unitWidth = 15;
+    const int shift = 3;
     const int heightPar = 3;
     const int startX = 50;
     const int statY = screenHeight - 50;
 
     //Initializing Main Matrix
     //--------------------------------------------------------------------------------------------------|
-    const int size = 17;
+    const int size = 60;
     int* mat = GenerateMat(size, max, min); 
     struct Rectangle** boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, statY);
 
@@ -32,7 +32,7 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     double currentTime = 0;
     double deltaTime = 0.f;
-    double timeInterval = 0.350f;
+    double timeInterval = 0.000f;
 
     //Common Sort Variables
     //--------------------------------------------------------------------------------------------------|
@@ -49,6 +49,11 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     bool BeginBubbleSort = false;
     int counter = 0;
+    
+    //InsertionSort Sort Variables
+    //--------------------------------------------------------------------------------------------------|
+    bool BeginInsertionSort = false;
+    bool endCycle = false;
 
     //Initializing Screen
     //--------------------------------------------------------------------------------------------------|
@@ -78,6 +83,11 @@ int main(void) {
 		    break;
 		case KEY_B:
 		    SortType = BubbleSort;
+		    break;
+		case KEY_I:
+		    SortType = InsertionSort; 
+		    BeginInsertionSort = true;
+		    currentTarget = 1;
 		    break;
 		default:
 		    Input = 0;
@@ -116,7 +126,7 @@ int main(void) {
 			}
 			if(startPoint == size - 1) {
 			    BeginSelectionSort = false;
-			    SortType = 0;
+			    SortType = none;
 			    iterate = true;
 			    iterator = 0;
 			    currentTarget = 0;
@@ -157,7 +167,7 @@ int main(void) {
 			if(counter == size - 1) {
 			    BeginBubbleSort = false;
 			    iterate = true;
-			    SortType = 0;
+			    SortType = none;
 			    iterator = 0;
 			    startPoint = 0;
 			    currentTarget = 0;
@@ -166,6 +176,41 @@ int main(void) {
 			}
 		    }
 		   
+		}
+
+		//InsertionSort per Time Interval
+		//--------------------------------------------------------------------------------------|
+		if(SortType == InsertionSort) {
+			iterate = true;
+			if(boxes[currentTarget]->height < boxes[iterator]->height){ 
+			    Swap(boxes[iterator], boxes[currentTarget]); 
+			    iterate = false;    	    
+			    endCycle = false;
+			} else if(endCycle) {
+			    startPoint++;
+			    iterator = startPoint; 
+			    currentTarget = startPoint + 1;
+			    iterate = false;
+			}
+			if(iterate) {
+			    iterator--; 
+			    currentTarget--; 
+			    if(iterator == -1) {
+				startPoint++;
+				iterator = startPoint; 
+				currentTarget = startPoint + 1; 
+			    }
+			    endCycle = true;
+			}
+			if(startPoint == size - 1) {
+			    BeginInsertionSort = false;
+			    SortType = none;
+			    iterator = 0;
+			    startPoint = 0;
+			    currentTarget = 0;
+			    counter = 0;
+			    Input = 0;
+			}
 		}
 	}
 
@@ -197,6 +242,14 @@ int main(void) {
 		if(counter != 0) DrawOutLine(size - counter - 1, GREEN, 1, boxes);
 		DrawOutLine(iterator, RAYWHITE, 1, boxes);
 		DrawOutLine(currentTarget, RAYWHITE, 1, boxes);
+	    }
+
+	    //InsertionSort 
+	    if(BeginInsertionSort) {
+		DrawOutLine(startPoint, GREEN, 1, boxes);
+		if(currentTarget != size)
+		    DrawOutLine(currentTarget, ORANGE, 1, boxes);
+		DrawOutLine(iterator, RAYWHITE, 1, boxes);
 	    }
 	 
 	EndDrawing();

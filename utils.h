@@ -18,8 +18,10 @@ void DrawOutLine(int index, Color color, int edge, struct Rectangle** boxes);
 //SortRelated Functions and Enum
 //------------------------------------------------------------------------------------------------------|
 enum SortType {
-	SelectionSort = 10,
+	none = 10,
+	SelectionSort,
 	BubbleSort,
+	InsertionSort,
 };
 
 void Swap(Rectangle* rec1, Rectangle* rec2);
