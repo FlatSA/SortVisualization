@@ -228,6 +228,10 @@ int main(void) {
 	    //Selection Sort Draw Section 
 	    if(BeginSelectionSort) {
 		if(iterator != size - 1) {
+		    if(size >= 50 && timeInterval < 0.2 && unitWidth < 15) { 
+		   	DrawOutLine(iterator - 1, RAYWHITE, 1, boxes); 
+		    }
+
 		    DrawOutLine(currentTarget, ORANGE, 1, boxes);
 		    DrawOutLine(iterator, RAYWHITE, 1, boxes);
 		} else {
