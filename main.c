@@ -57,7 +57,7 @@ int main(void) {
 
     //Initializing Screen
     //--------------------------------------------------------------------------------------------------|
-    SetTargetFPS(120);
+    SetTargetFPS(144);
     InitWindow(screenWidth, screenHeight, "HereWeGo");
 
 
