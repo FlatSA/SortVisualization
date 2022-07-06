@@ -236,12 +236,12 @@ int main(void) {
 	    //Time Interval Control
 	    DrawLine(0, screenHeight - 80, screenWidth, screenHeight - 80, Fade(GRAY, 0.6f));
 	    DrawRectangle(0, screenHeight - 80, screenWidth, 80, Fade(GRAY, 1.0f)); 
-	    timeScale = GuiSliderBar((Rectangle){50, screenHeight-50, 150, 20}, "speed", NULL, timeScale, 0.f, 0.650f);
+	    timeScale = GuiSliderBar((Rectangle){50, screenHeight-61, 150, 20}, "speed", NULL, timeScale, 0.f, 0.650f);
 	    timeInterval = 0.650f - timeScale;
 	    
 	    //Matrix Size Control
 	    if(SortType == none) {
-		sizeScale = GuiSliderBar((Rectangle){250, screenHeight-50, 150, 20}, "size", NULL, sizeScale, 4.0f, 81.0f);
+		sizeScale = GuiSliderBar((Rectangle){50, screenHeight - 39, 150, 20}, "size", NULL, sizeScale, 4.0f, 81.0f);
 		if(size  != (int)sizeScale) {
 			size = (int)sizeScale;
 			memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
