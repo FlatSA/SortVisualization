@@ -94,13 +94,17 @@ void DrawOutLine(int index, Color color, int edge, struct Rectangle** boxes) {
 
 //SortRelated Functions
 //------------------------------------------------------------------------------------------------------|
-void Swap(Rectangle* rec1, Rectangle* rec2) {
-	if(rec1 == rec2) return;
-	int flag = rec1->height;
-	rec1->height = rec2->height;
-	rec2->height = flag;
+void Swap(struct Rectangle** boxes, int* mat, int index1, int index2) {
+	if(mat[index1] == mat[index2]) return;
+	int flag = boxes[index1]->height;
+	boxes[index1]->height = boxes[index2]->height;
+	boxes[index2]->height = flag;
 
-	flag = rec1->y;
-	rec1->y = rec2->y;
-	rec2->y = flag;
+	flag = boxes[index1]->y;
+	boxes[index1]->y = boxes[index2]->y;
+	boxes[index2]->y = flag;
+
+	flag = mat[index1];
+	mat[index1] = mat[index2];
+	mat[index2] = flag;
 }

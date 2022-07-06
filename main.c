@@ -26,7 +26,7 @@ static int size = 20;
 static double sizeScale = 20;
 static int currentSize = 20; 
 static int* mat; 
-static int* currentMat;
+static int* memoryFreeFlag;
 static struct Rectangle** boxes;
 
 //Input Variables
@@ -92,7 +92,7 @@ int main(void) {
 		case KEY_N:
 		    FreeSpace(mat, boxes, size);
 		    mat = GenerateMat(size, max, min);
-		    currentMat = mat;
+		    //currentMat = mat;
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
 		    Input = 0;
 		    break;
@@ -143,7 +143,7 @@ int main(void) {
 			iterate = true;
 		    }
 		    if(iterator == size-1 && currentTarget != startPoint) {
-			Swap(boxes[currentTarget], boxes[startPoint]);
+			Swap(boxes, mat, currentTarget, startPoint);
 			iterate = false;
 		    }
 		    if(iterate) {
@@ -169,7 +169,7 @@ int main(void) {
 		if(SortType == BubbleSort && elivateSort) {
 		    iterate = true; 
 		    if(boxes[iterator]->height < boxes[currentTarget]->height) {
-			Swap(boxes[iterator], boxes[currentTarget]);
+			Swap(boxes, mat, currentTarget, iterator);
 			iterate = false;
 		    }
 		    if(iterate) {
@@ -194,7 +194,7 @@ int main(void) {
 		if(SortType == InsertionSort && elivateSort) {
 			iterate = true;
 			if(boxes[currentTarget]->height < boxes[iterator]->height){ 
-			    Swap(boxes[iterator], boxes[currentTarget]); 
+			    Swap(boxes, mat, iterator, currentTarget); 
 			    iterate = false;    	    
 			    endCycle = false;
 			} else if(endCycle) {
@@ -244,8 +244,9 @@ int main(void) {
 		sizeScale = GuiSliderBar((Rectangle){250, screenHeight-50, 150, 20}, "size", NULL, sizeScale, 4.0f, 81.0f);
 		if(size  != (int)sizeScale) {
 			size = (int)sizeScale;
-			mat = SubCopyMat(size, currentSize, mat, max, min); 	
-			free(currentMat);
+			memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
+			free(mat);
+			mat = memoryFreeFlag;
 			FreeBoxes(boxes, currentSize);
 			unitWidth = (screenWidth - 2 * startX) / size - shift;
 			boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);	

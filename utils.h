@@ -30,6 +30,6 @@ enum SortType {
 	InsertionSort,
 };
 
-void Swap(Rectangle* rec1, Rectangle* rec2);
+void Swap(struct Rectangle** boxes, int* mat, int index1, int index2);
 
 #endif
