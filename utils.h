@@ -7,11 +7,15 @@
 //------------------------------------------------------------------------------------------------------|
 int* GenerateMat(int size, int max, int min);
 
+int* SubCopyMat(int newSize, int currentSize, int* currentMat, int max, int min);
+
 int* GenerateTriangleMat(int size, int gap);
 
 struct Rectangle** GenerateBoxes(int size, int* mat, int width, int shift, int hPar, int sX, int sY);
 
 void FreeSpace(int* mat, struct Rectangle** boxes, int size);
+
+void FreeBoxes(struct Rectangle** boxes, int size);
 
 //Functions For Drawing on Screen
 //------------------------------------------------------------------------------------------------------|

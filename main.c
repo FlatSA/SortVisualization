@@ -1,25 +1,32 @@
 #include<raylib.h>
 #include"utils.h"
 #include<stdbool.h>
+#include<stddef.h>
+
+#define RAYGUI_IMPLEMENTATION
+#include"raygui.h"
 
 //Screen Related Variables
 //--------------------------------------------------------------------------------------------------|
-static const int screenWidth = 1200;
+static const int screenWidth = 1350;
 static const int screenHeight = 700;
-static const int max = 290;
+static const int max = 270;
 static const int min = 5;
-static const int unitWidth = 50;
+static int unitWidth = 50;
 static const int shift = 3;
 static const int heightPar = 2;
 static const int startX = 50;
-static const int startY = screenHeight - 50;
+static const int startY = screenHeight - 100;
 static const int unitGap = 0;
 static const int triangleGap = 12;
 
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
-static const int size = 20;
+static int size = 20;
+static double sizeScale = 20;
+static int currentSize = 20; 
 static int* mat; 
+static int* currentMat;
 static struct Rectangle** boxes;
 
 //Input Variables
@@ -31,7 +38,8 @@ static int SortType = none;
 //--------------------------------------------------------------------------------------------------|
 static double currentTime = 0;
 static double deltaTime = 0.f;
-static double timeInterval = 0.15;
+static double timeInterval = 0.25;
+static double timeScale = 0.25;
 
 //Common Sort Variables
 //--------------------------------------------------------------------------------------------------|
@@ -84,6 +92,7 @@ int main(void) {
 		case KEY_N:
 		    FreeSpace(mat, boxes, size);
 		    mat = GenerateMat(size, max, min);
+		    currentMat = mat;
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
 		    Input = 0;
 		    break;
@@ -219,6 +228,29 @@ int main(void) {
 
 	    for (int i = 0; i < size; i++) {
 		DrawRectangleRec(*boxes[i], RED);
+	    }
+	    
+	    //GUI controls section
+	    //------------------------------------------------------------------------------------------------------------------|
+
+	    //Time Interval Control
+	    DrawLine(0, screenHeight - 80, screenWidth, screenHeight - 80, Fade(GRAY, 0.6f));
+	    DrawRectangle(0, screenHeight - 80, screenWidth, 80, Fade(GRAY, 1.0f)); 
+	    timeScale = GuiSliderBar((Rectangle){50, screenHeight-50, 150, 20}, "speed", NULL, timeScale, 0.f, 0.650f);
+	    timeInterval = 0.650f - timeScale;
+	    
+	    //Matrix Size Control
+	    if(SortType == none) {
+		sizeScale = GuiSliderBar((Rectangle){250, screenHeight-50, 150, 20}, "size", NULL, sizeScale, 4.0f, 81.0f);
+		if(size  != (int)sizeScale) {
+			size = (int)sizeScale;
+			mat = SubCopyMat(size, currentSize, mat, max, min); 	
+			free(currentMat);
+			FreeBoxes(boxes, currentSize);
+			unitWidth = (screenWidth - 2 * startX) / size - shift;
+			boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);	
+			currentSize = size;
+		}
 	    }
 	   
 	    //Selection Sort Draw Section 
