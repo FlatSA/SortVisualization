@@ -36,4 +36,6 @@ void Swap(struct Rectangle** boxes, int* mat, int index1, int index2);
 //------------------------------------------------------------------------------------------------------|
 int AdjustUnitWidth(int screenWidth, int startX, int shift, int size);
 
+int AdjustTriangleGap(int size, int min, int max);
+
 #endif

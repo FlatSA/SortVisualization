@@ -18,7 +18,7 @@ static const int heightPar = 2;
 static const int startX = 50;
 static const int startY = screenHeight - 100;
 static const int unitGap = 0;
-static const int triangleGap = 12;
+static int triangleGap = 12;
 //Gui control panel
 static const int panelStartX = 0;
 static const int panelStartY = screenHeight - 80; 
@@ -79,8 +79,9 @@ int main(void) {
 
     //Initializing Main MAtrix
     //--------------------------------------------------------------------------------------------------|
-    mat = GenerateTriangleMat(size, triangleGap); 
+    triangleGap = AdjustTriangleGap(size, min, max);
     unitWidth = AdjustUnitWidth(screenWidth, startX, shift, size);
+    mat = GenerateTriangleMat(size, triangleGap); 
     boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
   
     //Initializing Screen
@@ -108,6 +109,7 @@ int main(void) {
 		    break;
 		case KEY_T: 
 		    FreeSpace(mat, boxes, size);
+		    triangleGap = AdjustTriangleGap(size, min, max);
 		    mat = GenerateTriangleMat(size, triangleGap); 
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
 		    Input = 0;

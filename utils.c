@@ -113,3 +113,7 @@ int AdjustUnitWidth(int screenWidth, int startX, int shift, int size) {
 	int width = ((screenWidth - 2 * startX) - shift*(size - 1)) / size;
 	return width;
 }
+
+int AdjustTriangleGap(int size, int min, int max) {
+	return (max - min)/size;
+}
