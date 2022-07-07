@@ -7,7 +7,17 @@
 #include"raygui.h"
 
 //raygui embedded styles 
+#include "styles/ashes.h"
+#include "styles/bluish.h"
+#include "styles/candy.h"
+#include "styles/cherry.h"
+#include "styles/cyber.h"
+#include "styles/dark.h"
+#include "styles/enefete.h"
+#include "styles/jungle.h"
+#include "styles/lavanda.h"
 #include "styles/style_terminal.h"
+#include "styles/sunny.h"
 
 //Screen Related Variables
 //--------------------------------------------------------------------------------------------------|
@@ -93,7 +103,7 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     SetTargetFPS(144);
     InitWindow(screenWidth, screenHeight, "HereWeGo");
-    GuiLoadStyleTerminal();
+    GuiLoadStyleCandy();
 
     while(!WindowShouldClose()) {
 
