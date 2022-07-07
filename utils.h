@@ -32,4 +32,8 @@ enum SortType {
 
 void Swap(struct Rectangle** boxes, int* mat, int index1, int index2);
 
+//Adjust visual settings 
+//------------------------------------------------------------------------------------------------------|
+int AdjustUnitWidth(int screenWidth, int startX, int shift, int size);
+
 #endif

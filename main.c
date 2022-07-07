@@ -13,12 +13,21 @@ static const int screenHeight = 700;
 static const int max = 270;
 static const int min = 5;
 static int unitWidth = 50;
-static const int shift = 3;
+static const int shift = 2;
 static const int heightPar = 2;
 static const int startX = 50;
 static const int startY = screenHeight - 100;
 static const int unitGap = 0;
 static const int triangleGap = 12;
+//Gui control panel
+static const int panelStartX = 0;
+static const int panelStartY = screenHeight - 80; 
+static const int panelWidth = screenWidth;
+static const int panelHeight = 80;
+static const int sliderMargin = 45;
+static const int sliderHeight = 22;
+static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
+static const int sliderGap = 4;
 
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
@@ -71,6 +80,7 @@ int main(void) {
     //Initializing Main MAtrix
     //--------------------------------------------------------------------------------------------------|
     mat = GenerateTriangleMat(size, triangleGap); 
+    unitWidth = AdjustUnitWidth(screenWidth, startX, shift, size);
     boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
   
     //Initializing Screen
@@ -234,21 +244,21 @@ int main(void) {
 	    //------------------------------------------------------------------------------------------------------------------|
 
 	    //Time Interval Control
-	    DrawLine(0, screenHeight - 80, screenWidth, screenHeight - 80, Fade(GRAY, 0.6f));
-	    DrawRectangle(0, screenHeight - 80, screenWidth, 80, Fade(GRAY, 1.0f)); 
-	    timeScale = GuiSliderBar((Rectangle){50, screenHeight-61, 150, 20}, "speed", NULL, timeScale, 0.f, 0.650f);
+	    DrawLine(panelStartX, panelStartY, panelWidth, panelStartY, Fade(GRAY, 0.6f));
+	    DrawRectangle(panelStartX, panelStartY, panelWidth, panelHeight, Fade(GRAY, 1.0f)); 
+	    timeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "speed", NULL, timeScale, 0.f, 0.650f);
 	    timeInterval = 0.650f - timeScale;
 	    
 	    //Matrix Size Control
 	    if(SortType == none) {
-		sizeScale = GuiSliderBar((Rectangle){50, screenHeight - 39, 150, 20}, "size", NULL, sizeScale, 4.0f, 81.0f);
+		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "size", NULL, sizeScale, 5.0f, 78.0f);
 		if(size  != (int)sizeScale) {
 			size = (int)sizeScale;
 			memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
 			free(mat);
 			mat = memoryFreeFlag;
 			FreeBoxes(boxes, currentSize);
-			unitWidth = (screenWidth - 2 * startX) / size - shift;
+			unitWidth = AdjustUnitWidth(screenWidth, startX, shift, size);
 			boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);	
 			currentSize = size;
 		}
