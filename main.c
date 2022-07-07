@@ -19,6 +19,8 @@
 #include "styles/style_terminal.h"
 #include "styles/sunny.h"
 
+#include "CandyStyleColors.h"
+
 //Screen Related Variables
 //--------------------------------------------------------------------------------------------------|
 static const int screenWidth = 1350;
@@ -254,7 +256,7 @@ int main(void) {
 	    ClearBackground(BLACK);
 
 	    for (int i = 0; i < size; i++) {
-		DrawRectangleRec(*boxes[i], RED);
+		DrawRectangleRec(*boxes[i], UNIT_COLOR);
 	    }
 	    
 	    //GUI controls section
