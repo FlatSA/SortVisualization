@@ -39,7 +39,7 @@ static const int panelStartX = 0;
 static const int panelStartY = screenHeight - 80; 
 static const int panelWidth = screenWidth;
 static const int panelHeight = 80;
-static const int sliderMargin = 45;
+static const int sliderMargin = 55;
 static const int sliderHeight = 22;
 static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
 static const int sliderGap = 4;
@@ -253,7 +253,7 @@ int main(void) {
     	BeginDrawing();
 	  
 	    //Drawing Matrix in a Current state	
-	    ClearBackground(BLACK);
+	    ClearBackground((Color){42, 40, 40, 255});
 
 	    for (int i = 0; i < size; i++) {
 		DrawRectangleRec(*boxes[i], UNIT_COLOR);
@@ -263,7 +263,7 @@ int main(void) {
 	    //------------------------------------------------------------------------------------------------------------------|
 
 	    //Time Interval Control
-	    DrawLine(panelStartX, panelStartY, panelWidth, panelStartY, Fade(GRAY, 0.6f));
+	    DrawLine(panelStartX, panelStartY, panelWidth, panelStartY, UNIT_COLOR);
 	    DrawRectangle(panelStartX, panelStartY, panelWidth, panelHeight, Fade(GRAY, 1.0f)); 
 	    timeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "speed", NULL, timeScale, minInterval, maxInterval);
 	    timeInterval = maxInterval - timeScale;

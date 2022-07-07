@@ -3,6 +3,6 @@
 #include<raylib.h>
 
 //Colors
-#define UNIT_COLOR (Color){255, 115, 125, 255} 
+#define UNIT_COLOR (Color){255, 90, 100, 255} 
 
 #endif
