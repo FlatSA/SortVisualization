@@ -2,21 +2,24 @@
 #include"utils.h"
 #include<stdbool.h>
 #include<stddef.h>
-
+//Required for GuiControls
 #define RAYGUI_IMPLEMENTATION
 #include"raygui.h"
+
+//raygui embedded styles 
+#include "styles/style_terminal.h"
 
 //Screen Related Variables
 //--------------------------------------------------------------------------------------------------|
 static const int screenWidth = 1350;
-static const int screenHeight = 700;
+static const int screenHeight = 680;
 static const int max = 270;
 static const int min = 5;
 static int unitWidth = 50;
 static const int shift = 2;
 static const int heightPar = 2;
 static const int startX = 50;
-static const int startY = screenHeight - 100;
+static const int startY = screenHeight - 110;
 static const int unitGap = 0;
 static int triangleGap = 12;
 //Gui control panel
@@ -47,8 +50,10 @@ static int SortType = none;
 //--------------------------------------------------------------------------------------------------|
 static double currentTime = 0;
 static double deltaTime = 0.f;
-static double timeInterval = 0.25;
+static double timeInterval = 0.20;
 static double timeScale = 0.25;
+static const double maxInterval = 0.600;
+static const double minInterval = 0.;
 
 //Common Sort Variables
 //--------------------------------------------------------------------------------------------------|
@@ -88,7 +93,7 @@ int main(void) {
     //--------------------------------------------------------------------------------------------------|
     SetTargetFPS(144);
     InitWindow(screenWidth, screenHeight, "HereWeGo");
-
+    GuiLoadStyleTerminal();
 
     while(!WindowShouldClose()) {
 
@@ -248,8 +253,8 @@ int main(void) {
 	    //Time Interval Control
 	    DrawLine(panelStartX, panelStartY, panelWidth, panelStartY, Fade(GRAY, 0.6f));
 	    DrawRectangle(panelStartX, panelStartY, panelWidth, panelHeight, Fade(GRAY, 1.0f)); 
-	    timeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "speed", NULL, timeScale, 0.f, 0.650f);
-	    timeInterval = 0.650f - timeScale;
+	    timeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "speed", NULL, timeScale, minInterval, maxInterval);
+	    timeInterval = maxInterval - timeScale;
 	    
 	    //Matrix Size Control
 	    if(SortType == none) {
