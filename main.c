@@ -43,6 +43,13 @@ static const int sliderMargin = 55;
 static const int sliderHeight = 22;
 static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
 static const int sliderGap = 4;
+//Initialize colors 
+static const Color SELECTION_ORANGE = SA_ORANGE;
+static const Color SORTED_PART_COLOR = SA_GREEN;
+static const Color ITERATION_COLOR = SA_WHITE;
+static const Color BACK_COLOR = DARKER_GRAY;
+static const Color UNIT_COLOR = LIGHT_RED; 
+static const Color PANEL_COLOR = LIGHT_GRAY;
 
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
@@ -253,7 +260,7 @@ int main(void) {
     	BeginDrawing();
 	  
 	    //Drawing Matrix in a Current state	
-	    ClearBackground((Color){42, 40, 40, 255});
+	    ClearBackground(BACK_COLOR);
 
 	    for (int i = 0; i < size; i++) {
 		DrawRectangleRec(*boxes[i], UNIT_COLOR);
@@ -264,7 +271,7 @@ int main(void) {
 
 	    //Time Interval Control
 	    DrawLine(panelStartX, panelStartY, panelWidth, panelStartY, UNIT_COLOR);
-	    DrawRectangle(panelStartX, panelStartY, panelWidth, panelHeight, Fade(GRAY, 1.0f)); 
+	    DrawRectangle(panelStartX, panelStartY, panelWidth, panelHeight, PANEL_COLOR); 
 	    timeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "speed", NULL, timeScale, minInterval, maxInterval);
 	    timeInterval = maxInterval - timeScale;
 	    
@@ -286,34 +293,34 @@ int main(void) {
 	    //Selection Sort Draw Section 
 	    if(BeginSelectionSort) {
 		if(iterator != size - 1) {
-		    if(timeInterval < 0.15 && size >= 35) { 
-		   	DrawOutLine(iterator - 1, RAYWHITE, unitGap, boxes); 
+		    if(timeInterval < 0.05 && size >= 45) { 
+		   	DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes); 
 		    }
-		    DrawOutLine(currentTarget, ORANGE, unitGap, boxes);
-		    DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
+		    DrawOutLine(currentTarget, SELECTION_ORANGE, unitGap, boxes);
+		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 		} else {
-		    DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
-		    DrawOutLine(currentTarget, ORANGE, unitGap, boxes);
+		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		    DrawOutLine(currentTarget, SELECTION_ORANGE, unitGap, boxes);
 		}
-		DrawOutLine(startPoint, GREEN, unitGap, boxes);
+		DrawOutLine(startPoint, SORTED_PART_COLOR, unitGap, boxes);
 	    }
 
 	    //Bubble Sort Draw Section
 	    if(BeginBubbleSort) {
 		elivateSort = true;
-		if(counter != 0) DrawOutLine(size - counter - 1, GREEN, unitGap, boxes);
-		DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
-		DrawOutLine(currentTarget, RAYWHITE, unitGap, boxes);
+		if(counter != 0) DrawOutLine(size - counter - 1, SORTED_PART_COLOR, unitGap, boxes);
+		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
 	    }
 
 	    //InsertionSort 
 	    if(BeginInsertionSort) {
 		elivateSort = true;
 		if(currentTarget != size)
-		    DrawOutLine(currentTarget, RAYWHITE, unitGap, boxes);
-		DrawOutLine(iterator, RAYWHITE, unitGap, boxes);
+		    DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
+		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 		if(startPoint < size - 1) 
-		    DrawOutLine(startPoint + 1, GREEN, unitGap, boxes);
+		    DrawOutLine(startPoint + 1, SORTED_PART_COLOR, unitGap, boxes);
 		
 	    }
 	 
