@@ -127,10 +127,10 @@ int main(void) {
 		case KEY_N:
 		    FreeSpace(mat, boxes, size);
 		    mat = GenerateMat(size, max, min);
-		    //currentMat = mat;
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
 		    Input = 0;
 		    break;
+		//Generate Triangle Matrix
 		case KEY_T: 
 		    FreeSpace(mat, boxes, size);
 		    triangleGap = AdjustTriangleGap(size, min, max);
@@ -143,12 +143,14 @@ int main(void) {
 		    SortType = SelectionSort;
 		    BeginSelectionSort = true;
 		    break;
+		//Begin Bubble Sort
 		case KEY_B:
 		    SortType = BubbleSort;
 		    BeginBubbleSort = true;
 		    startPoint++;
 		    iterator++;
 		    break;
+		//Begin InsertionSort
 		case KEY_I:
 		    SortType = InsertionSort; 
 		    BeginInsertionSort = true;
@@ -159,7 +161,7 @@ int main(void) {
 	    }	
 	}
 	
-	//To stop current Sort (should check documentation)
+	//To stop current Sort 
 	if(GetKeyPressed() == KEY_Q) 
 		Reset();
 
@@ -290,6 +292,9 @@ int main(void) {
 		}
 	    }
 	   
+	    //Sort Iteration Sort Section 
+	    //-------------------------------------------------------------------------------------------------------------------|
+	    
 	    //Selection Sort Draw Section 
 	    if(BeginSelectionSort) {
 		if(iterator != size - 1) {
