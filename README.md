@@ -2,3 +2,5 @@
 
 Insertion, Selection, Bubble sorts are available for now
 
+![](images/SortVisual.png)
+
