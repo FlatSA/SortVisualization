@@ -62,6 +62,8 @@ static const int titleFontSize = 30;
 static int size = 20;
 static double sizeScale = 20;
 static int currentSize = 20; 
+static const int maxSize = 78;
+static const int minSize = 7;
 static int* mat; 
 static int* memoryFreeFlag;
 static struct Rectangle** boxes;
@@ -333,7 +335,7 @@ int main(void) {
 	    
 	    //Matrix Size Control
 	    if(SortType == none) {
-		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "size", NULL, sizeScale, 5.0f, 78.0f);
+		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
 		if(size  != (int)sizeScale) {
 			size = (int)sizeScale;
 			memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
