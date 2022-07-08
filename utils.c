@@ -15,23 +15,25 @@ int* GenerateMat(int size, int max, int min) {
 }
 
 int* SubCopyMat(int newSize, int currentSize, int* currentMat, int max, int min) {
-	if(currentSize == newSize) {
-		return currentMat;
-	} else if(newSize < currentSize) {
-		int* newMat = malloc(newSize * sizeof(int));
-		for(int i = 0; i < newSize; i++) {
-			newMat[i] = currentMat[i];
-		}
-		return newMat;
-	} else if(newSize > currentSize) {
-		int* newMat = malloc(newSize * sizeof(int));
-		for(int i = 0; i < currentSize; i++) {
-			newMat[i] = currentMat[i];
-		}
-		for(int j = currentSize; j < newSize; j++) {
-			newMat[j] = (rand()%(max - min + 1) + min);
-		}
-		return newMat;
+	if(currentSize == newSize) 
+	    return currentMat;
+
+	if(newSize < currentSize) {
+	    int* newMat = malloc(newSize * sizeof(int));
+	    for(int i = 0; i < newSize; i++) {
+		    newMat[i] = currentMat[i];
+	    }
+	    return newMat;
+	}
+	if(newSize > currentSize) {
+	    int* newMat = malloc(newSize * sizeof(int));
+	    for(int i = 0; i < currentSize; i++) {
+		    newMat[i] = currentMat[i];
+	    }
+	    for(int j = currentSize; j < newSize; j++) {
+		    newMat[j] = (rand()%(max - min + 1) + min);
+	    }
+	    return newMat;
 	}	
 }
 
