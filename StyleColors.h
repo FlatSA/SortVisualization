@@ -1,5 +1,5 @@
-#ifndef CANDY_COLORS
-#define CANDY_COLORS
+#ifndef STYLE_COLORS
+#define STYLE_COLORS
 #include<raylib.h>
 
 //Colors
