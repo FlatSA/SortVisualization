@@ -19,7 +19,7 @@
 #include "styles/style_terminal.h"
 #include "styles/sunny.h"
 
-#include "CandyStyleColors.h"
+#include "StyleColors.h"
 
 //Screen Related Variables
 //--------------------------------------------------------------------------------------------------|
@@ -45,10 +45,17 @@ static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
 static const int sliderGap = 4;
 static const int buttonWidth = 615;
 static const int buttonMargin = 20;
-static const int sheetMarginX = 300;
-static const int sheetMarginY = 100;
+static const int sheetMarginX = 425;
+static const int sheetMarginY = 150;
 static double showControlSheet = false;
 static const int frameMargin = 20;
+static const int textMarginX = 40;
+static const int textMarginY = 100;
+static const int fontSize = 20;
+static const int textGap = 6;
+static const int titleMarginX = 120;
+static const int titleMarginY = 30;
+static const int titleFontSize = 30;
 
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
@@ -111,7 +118,7 @@ int main(void) {
     //Initializing Screen and raugui style
     //--------------------------------------------------------------------------------------------------|
     SetTargetFPS(144);
-    InitWindow(screenWidth, screenHeight, "HereWeGo");
+    InitWindow(screenWidth, screenHeight, "Let it Sort!");
     GuiLoadStyleDark();
 
     while(!WindowShouldClose()) {
@@ -339,7 +346,7 @@ int main(void) {
 		}
 	    }
 
-	    //Sort Sheet 
+	    //Control Sheet 
 	    if(GuiButton((Rectangle){sliderMargin + sliderWidth + buttonMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, buttonWidth, sliderHeight*2 + sliderGap}, "Show Control Sheet")) { 
 		    if(!showControlSheet) {
 			showControlSheet = true;
@@ -369,6 +376,16 @@ int main(void) {
 		    DrawLine(screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
 		    //Draw Text 
 		    //DrawText(text, x, y, fontSize, Color)
+		    //
+		    DrawText("Control Sheet", sheetMarginX + frameMargin + titleMarginX, sheetMarginY + frameMargin + titleMarginY, titleFontSize, FONT_COLOR);
+		    DrawText("KEY_I - to initiate insertion sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY, fontSize, FONT_COLOR);
+		    DrawText("KEY_S - to initiate selection sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize + textGap, fontSize, FONT_COLOR);
+		    DrawText("KEY_B - to initiate bubble sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*2 + textGap*2, fontSize, FONT_COLOR);
+		    DrawText("KEY_Q - to stop current sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*3 + textGap*3, fontSize, FONT_COLOR);
+		    DrawText("KEY_N - to generate new matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*4 + textGap*4, fontSize, FONT_COLOR);
+		    DrawText("KEY_T - to generate triangle matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*5 + textGap*5, fontSize, FONT_COLOR);
+		    DrawText("KEY_ENTER - to close control sheet", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*6 + textGap*6, fontSize, FONT_COLOR);
+		    DrawText("KEY_ESC - to close application", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*7 + textGap*7, fontSize, FONT_COLOR);
 	    }
 	 
 	EndDrawing();
