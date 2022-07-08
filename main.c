@@ -43,13 +43,12 @@ static const int sliderMargin = 65;
 static const int sliderHeight = 22;
 static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
 static const int sliderGap = 4;
-//Initialize colors 
-static const Color SELECTION_ORANGE = SA_ORANGE;
-static const Color SORTED_PART_COLOR = SA_GREEN;
-static const Color ITERATION_COLOR = SA_WHITE;
-static const Color BACK_COLOR = DARKER_GRAY;
-static const Color UNIT_COLOR = LIGHT_RED; 
-static const Color PANEL_COLOR = LIGHT_GRAY;
+static const int buttonWidth = 615;
+static const int buttonMargin = 20;
+static const int sheetMarginX = 300;
+static const int sheetMarginY = 100;
+static double showControlSheet = false;
+static const int frameMargin = 20;
 
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
@@ -63,6 +62,7 @@ static struct Rectangle** boxes;
 //Input Variables
 //--------------------------------------------------------------------------------------------------|
 static int Input = 0;
+static int DuringSort = 0;
 static int SortType = none;
 
 //Time Interval Variables
@@ -71,7 +71,7 @@ static double currentTime = 0;
 static double deltaTime = 0.f;
 static double timeInterval = 0.20;
 static double timeScale = 0.25;
-static const double maxInterval = 0.600;
+static const double maxInterval = 0.500;
 static const double minInterval = 0.;
 
 //Common Sort Variables
@@ -108,11 +108,11 @@ int main(void) {
     mat = GenerateTriangleMat(size, triangleGap); 
     boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
   
-    //Initializing Screen
+    //Initializing Screen and raugui style
     //--------------------------------------------------------------------------------------------------|
     SetTargetFPS(144);
     InitWindow(screenWidth, screenHeight, "HereWeGo");
-    GuiLoadStyleCandy();
+    GuiLoadStyleDark();
 
     while(!WindowShouldClose()) {
 
@@ -156,14 +156,24 @@ int main(void) {
 		    BeginInsertionSort = true;
 		    currentTarget = 1;
 		    break;
+		case KEY_ENTER: 
+		    showControlSheet = false;
 		default:
 		    Input = 0;
 	    }	
 	}
 	
-	//To stop current Sort 
-	if(GetKeyPressed() == KEY_Q) 
-		Reset();
+	if(Input != 0) {
+	    DuringSort = GetKeyPressed();
+	    
+	    switch(DuringSort) {
+		    case KEY_Q: 
+			Reset();
+			break; 
+		    case KEY_ENTER: 
+			showControlSheet = false;
+	    }
+	}
 
 	//Ensure Time Interval and Make One Sort-Step per timeInterval
 	//----------------------------------------------------------------------------------------------|	
@@ -266,8 +276,45 @@ int main(void) {
 
 	    for (int i = 0; i < size; i++) {
 		DrawRectangleRec(*boxes[i], UNIT_COLOR);
-	    }
+	    } 
+	   
+	    //Sort Iteration Section 
+	    //-------------------------------------------------------------------------------------------------------------------|
 	    
+	    //Selection Sort Draw Section 
+	    if(BeginSelectionSort) {
+		if(iterator != size - 1) {
+		    if(timeInterval < 0.05 && size >= 45) { 
+		   	DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes); 
+		    }
+		    DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
+		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		} else {
+		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		    DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
+		}
+		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
+	    }
+
+	    //Bubble Sort Draw Section
+	    if(BeginBubbleSort) {
+		elivateSort = true;
+		if(counter != 0) DrawOutLine(size - counter - 1, SORTED_COLOR, unitGap, boxes);
+		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
+	    }
+
+	    //InsertionSort 
+	    if(BeginInsertionSort) {
+		elivateSort = true;
+		if(currentTarget != size)
+		    DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
+		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		if(startPoint < size - 1) 
+		    DrawOutLine(startPoint + 1, SORTED_COLOR, unitGap, boxes);
+		
+	    }
+
 	    //GUI controls section
 	    //------------------------------------------------------------------------------------------------------------------|
 
@@ -291,42 +338,37 @@ int main(void) {
 			currentSize = size;
 		}
 	    }
-	   
-	    //Sort Iteration Sort Section 
-	    //-------------------------------------------------------------------------------------------------------------------|
-	    
-	    //Selection Sort Draw Section 
-	    if(BeginSelectionSort) {
-		if(iterator != size - 1) {
-		    if(timeInterval < 0.05 && size >= 45) { 
-		   	DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes); 
+
+	    //Sort Sheet 
+	    if(GuiButton((Rectangle){sliderMargin + sliderWidth + buttonMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, buttonWidth, sliderHeight*2 + sliderGap}, "Show Control Sheet")) { 
+		    if(!showControlSheet) {
+			showControlSheet = true;
+		    } else {
+			showControlSheet = false;
 		    }
-		    DrawOutLine(currentTarget, SELECTION_ORANGE, unitGap, boxes);
-		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-		} else {
-		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-		    DrawOutLine(currentTarget, SELECTION_ORANGE, unitGap, boxes);
-		}
-		DrawOutLine(startPoint, SORTED_PART_COLOR, unitGap, boxes);
 	    }
-
-	    //Bubble Sort Draw Section
-	    if(BeginBubbleSort) {
-		elivateSort = true;
-		if(counter != 0) DrawOutLine(size - counter - 1, SORTED_PART_COLOR, unitGap, boxes);
-		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-		DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
-	    }
-
-	    //InsertionSort 
-	    if(BeginInsertionSort) {
-		elivateSort = true;
-		if(currentTarget != size)
-		    DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
-		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-		if(startPoint < size - 1) 
-		    DrawOutLine(startPoint + 1, SORTED_PART_COLOR, unitGap, boxes);
-		
+	    
+	    if(showControlSheet) {
+		    //Draw Menu
+		    DrawRectangle(sheetMarginX, sheetMarginY, screenWidth - sheetMarginX*2, screenHeight - sheetMarginY*2, MENU_OUTER_GRAY );
+		    DrawRectangle(sheetMarginX + frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX*2 - frameMargin*2, screenHeight - sheetMarginY*2 - frameMargin*2, MENU_INNER_GRAY);
+		    //Draw Inner Frame
+		    DrawLine(sheetMarginX + frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, MENU_OUTLINE_COLOR);
+		    DrawLine(sheetMarginX + frameMargin, sheetMarginY + frameMargin, sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR); 
+		    DrawLine(sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
+		    DrawLine(screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
+		    //Draw Outer Frame
+		    DrawLine(sheetMarginX, sheetMarginY, screenWidth - sheetMarginX, sheetMarginY, MENU_OUTLINE_COLOR);
+		    DrawLine(sheetMarginX, sheetMarginY, sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR); 
+		    DrawLine(sheetMarginX, screenHeight - sheetMarginY, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
+		    DrawLine(screenWidth - sheetMarginX, sheetMarginY, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
+		    //Draw Diag Frame 
+		    DrawLine(sheetMarginX, sheetMarginY, sheetMarginX + frameMargin, sheetMarginY + frameMargin, MENU_OUTLINE_COLOR);
+		    DrawLine(screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX, sheetMarginY, MENU_OUTLINE_COLOR); 
+		    DrawLine(sheetMarginX, screenHeight - sheetMarginY, sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
+		    DrawLine(screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
+		    //Draw Text 
+		    //DrawText(text, x, y, fontSize, Color)
 	    }
 	 
 	EndDrawing();
