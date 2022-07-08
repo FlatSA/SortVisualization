@@ -6,19 +6,9 @@
 #define RAYGUI_IMPLEMENTATION
 #include"raygui.h"
 
-//raygui embedded styles 
-#include "styles/ashes.h"
-#include "styles/bluish.h"
-#include "styles/candy.h"
-#include "styles/cherry.h"
-#include "styles/cyber.h"
+//raygui embedded style 
 #include "styles/dark.h"
-#include "styles/enefete.h"
-#include "styles/jungle.h"
-#include "styles/lavanda.h"
-#include "styles/style_terminal.h"
-#include "styles/sunny.h"
-
+//Colors for styles/dark.h
 #include "StyleColors.h"
 
 //Screen Related Variables
