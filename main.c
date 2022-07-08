@@ -155,6 +155,7 @@ int main(void) {
 		    BeginInsertionSort = true;
 		    currentTarget = 1;
 		    break;
+		//Close Control Sheet
 		case KEY_ENTER: 
 		    showControlSheet = false;
 		default:
@@ -162,13 +163,16 @@ int main(void) {
 	    }	
 	}
 	
+	//In case Sort is in Action
 	if(Input != 0) {
 	    DuringSort = GetKeyPressed();
 	    
 	    switch(DuringSort) {
+		    //Stop sort
 		    case KEY_Q: 
 			Reset();
 			break; 
+		    //Close Control Sheet 
 		    case KEY_ENTER: 
 			showControlSheet = false;
 	    }
@@ -338,7 +342,7 @@ int main(void) {
 		}
 	    }
 
-	    //Control Sheet 
+	    //Control Sheet Button 
 	    if(GuiButton((Rectangle){sliderMargin + sliderWidth + buttonMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, buttonWidth, sliderHeight*2 + sliderGap}, "Show Control Sheet")) { 
 		    if(!showControlSheet) {
 			showControlSheet = true;
@@ -347,6 +351,7 @@ int main(void) {
 		    }
 	    }
 	    
+	    //Control Sheet set up
 	    if(showControlSheet) {
 		    //Draw Menu
 		    DrawRectangle(sheetMarginX, sheetMarginY, screenWidth - sheetMarginX*2, screenHeight - sheetMarginY*2, MENU_OUTER_GRAY );
