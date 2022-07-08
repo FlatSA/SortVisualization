@@ -9,7 +9,7 @@
 //raygui embedded style 
 #include "styles/dark.h"
 //Colors for styles/dark.h
-#include "StyleColors.h"
+#include "styles/StyleColors.h"
 
 //Screen Related Variables
 //--------------------------------------------------------------------------------------------------|
