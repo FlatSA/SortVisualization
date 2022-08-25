@@ -2,14 +2,17 @@
 #include"utils.h"
 #include<stdbool.h>
 #include<stddef.h>
+#include<pthread.h>
+#define _OPEN_THREADS
+#include<signal.h>
 //Required for GuiControls
 #define RAYGUI_IMPLEMENTATION
 #include"raygui.h"
 
-//raygui embedded style 
-#include "styles/dark.h"
+//raygui embedded style #include "styles/dark.h"
 //Colors for styles/dark.h
 #include "styles/StyleColors.h"
+#include "styles/dark.h"
 
 //Screen Related Variables
 //--------------------------------------------------------------------------------------------------|
@@ -28,7 +31,7 @@ static int triangleGap = 12;
 static const int panelStartX = 0;
 static const int panelStartY = screenHeight - 80; 
 static const int panelWidth = screenWidth;
-static const int panelHeight = 80;
+static const int panelHeight = 80; 
 static const int sliderMargin = 65;
 static const int sliderHeight = 22;
 static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
@@ -57,6 +60,7 @@ static const int minSize = 7;
 static int* mat; 
 static int* memoryFreeFlag;
 static struct Rectangle** boxes;
+static struct Rectange* copyBoxe;
 
 //Input Variables
 //--------------------------------------------------------------------------------------------------|
@@ -80,6 +84,8 @@ static int startPoint = 0;
 static int currentTarget = 0;
 static bool iterate = true;
 static bool elivateSort = false;
+static bool initSort = true;
+static bool stopSorting = false;
 
 //Selection Sort Variables
 //--------------------------------------------------------------------------------------------------|
@@ -95,21 +101,32 @@ static int counter = 0;
 static bool BeginInsertionSort = false;
 static bool endCycle = false;
 
+pthread_mutex_t condition_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t  condition_cond  = PTHREAD_COND_INITIALIZER;
+
 //Common Sort Variables Reset Function 
+static void Draw();
 static void Reset();
+static void *MainCycle();
+static void *SelectionSortAlgo();
+static void *BubbleSortAlgo();
+static void *InsertionSortAlgo();
 
 int main(void) {
+    
+    /*pthread_t mainThread;
+    pthread_create(&mainThread, NULL, &MainCycle, NULL);
+    pthread_join(mainThread, NULL);*/
 
     //Initializing Main MAtrix
-    //--------------------------------------------------------------------------------------------------|
-    triangleGap = AdjustTriangleGap(size, min, max);
+    //--------------------------------------------------------------------------------------------------| triangleGap = AdjustTriangleGap(size, min, max);
     unitWidth = AdjustUnitWidth(screenWidth, startX, shift, size);
     mat = GenerateTriangleMat(size, triangleGap); 
     boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
   
     //Initializing Screen and raugui style
     //--------------------------------------------------------------------------------------------------|
-    SetTargetFPS(144);
+    SetTargetFPS(200);
     InitWindow(screenWidth, screenHeight, "Let it Sort!");
     GuiLoadStyleDark();
 
@@ -170,7 +187,8 @@ int main(void) {
 	    switch(DuringSort) {
 		    //Stop sort
 		    case KEY_Q: 
-			Reset();
+			//quit
+			stopSorting = true;
 			break; 
 		    //Close Control Sheet 
 		    case KEY_ENTER: 
@@ -188,7 +206,7 @@ int main(void) {
 		
 		//SelectionSort per Time Interval
 		//--------------------------------------------------------------------------------------|
-		if(SortType == SelectionSort) {
+		/*if(SortType == SelectionSort) {
 		    if(!iterate) {
 			iterator++;
 			iterate = true;
@@ -213,11 +231,21 @@ int main(void) {
 			
 		    }
 		   
+		}*/
+		if(SortType == SelectionSort) {
+			if(initSort) {
+				pthread_t sort_thread;
+				pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
+				initSort = false;
+			}	    
+			pthread_mutex_lock(&condition_mutex);
+			pthread_cond_signal(&condition_cond); 
+		        pthread_mutex_unlock(&condition_mutex);
 		}
 
 		//BubbleSort per Time Interval
 		//--------------------------------------------------------------------------------------|
-		if(SortType == BubbleSort && elivateSort) {
+		/*if(SortType == BubbleSort && elivateSort) {
 		    iterate = true; 
 		    if(boxes[iterator]->height < boxes[currentTarget]->height) {
 			Swap(boxes, mat, currentTarget, iterator);
@@ -238,11 +266,21 @@ int main(void) {
 			}
 		    }
 		   
+		}*/
+		if(SortType == BubbleSort) {
+			if(initSort) {
+				pthread_t sort_thread;
+				pthread_create(&sort_thread, NULL, BubbleSortAlgo, NULL);
+				initSort = false;
+			}
+			pthread_mutex_lock(&condition_mutex);
+			pthread_cond_signal(&condition_cond); 
+		        pthread_mutex_unlock(&condition_mutex);
 		}
 
 		//InsertionSort per Time Interval
 		//--------------------------------------------------------------------------------------|
-		if(SortType == InsertionSort && elivateSort) {
+		/*if(SortType == InsertionSort && elivateSort) {
 			iterate = true;
 			if(boxes[currentTarget]->height < boxes[iterator]->height){ 
 			    Swap(boxes, mat, iterator, currentTarget); 
@@ -267,7 +305,18 @@ int main(void) {
 			if(startPoint == size - 1) {
 			    Reset();
 			}
+		}*/
+		if(SortType == InsertionSort){
+			if(initSort) {
+				pthread_t sort_thread;
+				pthread_create(&sort_thread, NULL, InsertionSortAlgo, NULL);
+				initSort = false;
+			}
+			pthread_mutex_lock(&condition_mutex);
+			pthread_cond_signal(&condition_cond); 
+		        pthread_mutex_unlock(&condition_mutex);
 		}
+		
 	}
 
 	//Draw Section
@@ -286,7 +335,7 @@ int main(void) {
 	    
 	    //Selection Sort Draw Section 
 	    if(BeginSelectionSort) {
-		if(iterator != size - 1) {
+		/*if(iterator != size - 1) {
 		    if(timeInterval < 0.05 && size >= 45) { 
 		   	DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes); 
 		    }
@@ -296,26 +345,38 @@ int main(void) {
 		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 		    DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
 		}
+		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);*/
+		DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
+		if(iterator == size) DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes);
+		if(iterator < size) DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 	    }
 
 	    //Bubble Sort Draw Section
 	    if(BeginBubbleSort) {
-		elivateSort = true;
+		/*elivateSort = true;
 		if(counter != 0) DrawOutLine(size - counter - 1, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 		DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
+		*/
+		if(startPoint != 0) DrawOutLine(size - 1 - startPoint, SORTED_COLOR, unitGap, boxes);
+		DrawOutLine(iterator + 1, ITERATION_COLOR, unitGap, boxes);
+		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+
 	    }
 
 	    //InsertionSort 
 	    if(BeginInsertionSort) {
-		elivateSort = true;
+		/*elivateSort = true;
 		if(currentTarget != size)
 		    DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 		if(startPoint < size - 1) 
 		    DrawOutLine(startPoint + 1, SORTED_COLOR, unitGap, boxes);
-		
+		*/
+		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
+		DrawOutLine(iterator+1, ITERATION_COLOR, unitGap, boxes);
+		if(iterator != -1) DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 	    }
 
 	    //GUI controls section
@@ -392,13 +453,17 @@ int main(void) {
     FreeSpace(mat, boxes, size);
 
     CloseWindow();
-    
     return 0;
+}
+
+static void *MainCycle() {
+
+  
 }
 
 static void Reset() {
     Input = 0;
-    SortType = none;
+    SortType = none; 
     startPoint = 0; 
     currentTarget = 0;
     iterator = 0;
@@ -409,4 +474,94 @@ static void Reset() {
     BeginInsertionSort = false;
     counter = 0;
     endCycle = false;
+    initSort = true;
+    DuringSort = 0;
+    stopSorting = false;
+}
+
+static void *SelectionSortAlgo() {
+	for(startPoint = 0; startPoint < size - 1; startPoint++) {
+		currentTarget = startPoint;
+		for(iterator = startPoint + 1; iterator < size; iterator++) {
+			if(mat[currentTarget] > mat[iterator])
+				currentTarget = iterator;
+			
+			if(stopSorting){ 
+				printf("after first");
+				Reset();
+				return NULL;
+				
+			}
+
+			pthread_mutex_lock(&condition_mutex);
+			pthread_cond_wait(&condition_cond, &condition_mutex);
+			pthread_mutex_unlock(&condition_mutex);
+
+	    	}
+		if(currentTarget != startPoint) { 
+
+			printf("%d\n", iterator);
+		    	Swap(boxes, mat, currentTarget, startPoint);
+			
+			if(stopSorting){ 
+				printf("after second");
+				Reset();
+				return NULL;
+
+			}
+
+			pthread_mutex_lock(&condition_mutex);
+			pthread_cond_wait(&condition_cond, &condition_mutex);
+			pthread_mutex_unlock(&condition_mutex);
+
+		}
+
+	}
+	Reset();
+	return NULL;
+}
+
+static void *BubbleSortAlgo() {
+    for(startPoint = 0; startPoint < size - 1; startPoint++) {
+	    for(iterator = 0; iterator < size - 1 - startPoint; iterator++) {
+		    pthread_mutex_lock(&condition_mutex);
+		    pthread_cond_wait(&condition_cond, &condition_mutex);
+		    pthread_mutex_unlock(&condition_mutex);
+
+		    if(mat[iterator] > mat[iterator + 1]) {
+			    Swap(boxes, mat, iterator, iterator + 1);
+			    pthread_mutex_lock(&condition_mutex);
+			    pthread_cond_wait(&condition_cond, &condition_mutex);
+			    pthread_mutex_unlock(&condition_mutex);
+
+		    }
+	    }
+    }
+    Reset();
+}
+
+static void *InsertionSortAlgo() {
+	Rectangle unit;
+	for(startPoint = 1; startPoint < size; startPoint++) {
+	    iterator = startPoint - 1;
+	    while( iterator >= 0 && mat[iterator] > mat[iterator+1]) { 
+		pthread_mutex_lock(&condition_mutex);
+		pthread_cond_wait(&condition_cond, &condition_mutex);
+		pthread_mutex_unlock(&condition_mutex);
+
+		Swap(boxes, mat, iterator, iterator+1);
+		pthread_mutex_lock(&condition_mutex);
+		pthread_cond_wait(&condition_cond, &condition_mutex);
+		pthread_mutex_unlock(&condition_mutex);
+
+		iterator--;
+	    }	    
+		pthread_mutex_lock(&condition_mutex);
+		pthread_cond_wait(&condition_cond, &condition_mutex);
+		pthread_mutex_unlock(&condition_mutex);
+		
+		 
+	}
+
+	Reset();
 }
