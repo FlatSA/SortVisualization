@@ -5,7 +5,6 @@
 //Required for GuiControls
 #define RAYGUI_IMPLEMENTATION
 #include"raygui.h"
-
 //raygui embedded style #include "styles/dark.h"
 //Colors for styles/dark.h
 #include "styles/StyleColors.h"
@@ -29,11 +28,15 @@ static int triangleGap = 12;
 //Gui control panel
 static const int panelStartX = 0;
 static const int panelStartY = screenHeight - 80; 
-static const int panelWidth = screenWidth; static const int panelHeight = 80; static const int sliderMargin = 65; static const int sliderHeight = 22;
+static const int panelWidth = screenWidth; 
+static const int panelHeight = 80; 
+static const int sliderMargin = 65; 
+static const int sliderHeight = 22;
 static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
-static const int sliderGap = 4; static const int buttonWidth = 615;
+static const int sliderGap = 4; 
+static const int buttonWidth = 615;
 static const int buttonMargin = 20;
-static const int sheetMarginX = 425;
+static const int sheetMarginX = 425; 
 static const int sheetMarginY = 150;
 static double showControlSheet = false;
 static const int frameMargin = 20;
@@ -50,11 +53,10 @@ static const int titleFontSize = 30;
 static int size = 20;
 static double sizeScale = 20;
 static int currentSize = 20; 
-static const int maxSize = 600;
+static const int maxSize = 1245;
 static const int minSize = 7;
 static int* mat; 
-static int* memoryFreeFlag;
-static struct Rectangle** boxes;
+static int* memoryFreeFlag; static struct Rectangle** boxes;
 static struct Rectange* copyBoxe;
 static char size_str[10];
 
@@ -77,8 +79,6 @@ static const double minInterval = 0.;
 static int iterator = 0;
 static int startPoint = 0;
 static int currentTarget = 0;
-//static bool iterate = true;
-//static bool elivateSort = false;
 static bool initSort = true;
 static bool initDraw = false;
 static bool stopSorting = false;
@@ -90,12 +90,10 @@ static bool DrawSelectionSort = false;
 //Bubble Sort Variables
 //--------------------------------------------------------------------------------------------------|
 static bool DrawBubbleSort = false;
-//static int counter = 0;
     
 //Insertion Sort Variables
 //--------------------------------------------------------------------------------------------------|
 static bool DrawInsertionSort = false;
-//static bool endCycle = false;
 
 //Shaker Sort Variables
 static bool DrawShakerSort = false;
@@ -111,7 +109,7 @@ static int right_end = 0;
 pthread_mutex_t var_mutex	= PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t condition_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  condition_cond  = PTHREAD_COND_INITIALIZER;
-pthread_t sort_thread;
+pthread_t sort_thread/*, mainThread;*/;
 
 //Functions 
 //static void Draw();
@@ -127,10 +125,6 @@ static void *MergeSortAlgo();
 static void MergeSortRec(int right, int left);
 
 int main(void) {
-    
-    /*pthread_t mainThread;
-    pthread_create(&mainThread, NULL, &MainCycle, NULL);
-    pthread_join(mainThread, NULL);*/
 
     //Initializing Main MAtrix
     //--------------------------------------------------------------------------------------------------| 
@@ -171,14 +165,13 @@ int main(void) {
 		    break;
 		//Begin Selection Sort    
 		case KEY_S:
-		    SortType = SelectionSort; DrawSelectionSort = true;
+		    SortType = SelectionSort; 
+		    DrawSelectionSort = true;
 		    break;
 		//Begin Bubble Sort
 		case KEY_B:
 		    SortType = BubbleSort;
 		    DrawBubbleSort = true;
-		    //startPoint++;
-		    //iterator++;
 		    break;
 		//Begin Insertion Sort
 		case KEY_I:
@@ -237,34 +230,6 @@ int main(void) {
 	if((deltaTime > timeInterval) && Input) {
 		currentTime = GetTime();
 		
-		//SelectionSort per Time Interval
-		//--------------------------------------------------------------------------------------|
-		/*if(SortType == SelectionSort) {
-		    if(!iterate) {
-			iterator++;
-			iterate = true;
-		    }
-		    if(iterator == size-1 && currentTarget != startPoint) {
-			Swap(boxes, mat, currentTarget, startPoint);
-			iterate = false;
-		    }
-		    if(iterate) {
-			if(iterator < size -1) {
-			    iterator++;
-			} else {
-			    startPoint++;
-			    currentTarget = startPoint;
-			    iterator = startPoint + 1;
-			}
-			if(startPoint == size - 1) 
-			    Reset();
-			if(boxes[currentTarget]->height > boxes[iterator]->height) {
-			    currentTarget = iterator;
-			}
-			
-		    }
-		   
-		}*/
 		if(SortType == SelectionSort) {
 			if(initSort) { pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
 				initSort = false;
@@ -272,30 +237,6 @@ int main(void) {
 			ThreadWake();	
 		}
 
-		//BubbleSort per Time Interval
-		//--------------------------------------------------------------------------------------|
-		/*if(SortType == BubbleSort && elivateSort) {
-		    iterate = true; 
-		    if(boxes[iterator]->height < boxes[currentTarget]->height) {
-			Swap(boxes, mat, currentTarget, iterator);
-			iterate = false;
-		    }
-		    if(iterate) {
-			if(iterator < size - 1 - counter) { 
-			    iterator++;
-			    currentTarget++; 
-			} else {
-			    currentTarget = 0;
-			    iterator = startPoint;
-			    counter++;
-			}
-
-			if(counter == size - 1) {
-			    Reset();
-			}
-		    }
-		   
-		}*/
 		if(SortType == BubbleSort) {
 			if(initSort) {
 				pthread_create(&sort_thread, NULL, BubbleSortAlgo, NULL);
@@ -304,34 +245,6 @@ int main(void) {
 			ThreadWake();
 		}
 
-		//InsertionSort per Time Interval
-		//--------------------------------------------------------------------------------------|
-		/*if(SortType == InsertionSort && elivateSort) {
-			iterate = true;
-			if(boxes[currentTarget]->height < boxes[iterator]->height){ 
-			    Swap(boxes, mat, iterator, currentTarget); 
-			    iterate = false;    	    
-			    endCycle = false;
-			} else if(endCycle) {
-			    startPoint++;
-			    iterator = startPoint; 
-			    currentTarget = startPoint + 1;
-			    iterate = false;
-			}
-			if(iterate) {
-			    iterator--; 
-			    currentTarget--; 
-			    if(iterator == -1) {
-				startPoint++;
-				iterator = startPoint; 
-				currentTarget = startPoint + 1; 
-			    }
-			    endCycle = true;
-			}
-			if(startPoint == size - 1) {
-			    Reset();
-			}
-		}*/
 		if(SortType == InsertionSort) {
 			if(initSort) {
 				pthread_create(&sort_thread, NULL, InsertionSortAlgo, NULL);
@@ -340,8 +253,6 @@ int main(void) {
 			ThreadWake();	
 		}
 
-		//ShakerSort per Time Iterval
-		//--------------------------------------------------------------------------------------|
 		if(SortType == ShakerSort) {
 			if(initSort) {
 				pthread_create(&sort_thread, NULL, ShakerSortAlgo, NULL);
@@ -366,11 +277,11 @@ int main(void) {
 	    //Drawing Matrix in a Current state	
 	    ClearBackground(BACK_COLOR);
 
-	    //pthread_mutex_lock(&var_mutex);
+	    pthread_mutex_lock(&var_mutex);
 	    for (int i = 0; i < size; i++) {
 		DrawRectangleRec(*boxes[i], UNIT_COLOR);
 	    } 
-	    //pthread_mutex_lock(&var_mutex);
+	    pthread_mutex_unlock(&var_mutex);
 
 	    //Draw size of matrix
 	    sprintf(size_str, "%d", size);
@@ -381,65 +292,52 @@ int main(void) {
 	    
 	    //Selection Sort Draw Section 
 	    if(DrawSelectionSort && initDraw) {
-		/*if(iterator != size - 1) {
-		    if(timeInterval < 0.05 && size >= 45) { 
-		   	DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes); 
-		    }
-		    DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
-		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-		} else {
-		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-		    DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
-		}
-		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);*/
-		if(timeInterval < 0.06) DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes);
+		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
-		if(iterator == size) DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes);
+	    	if(timeInterval < 0.06) DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes);
 		if(iterator < size) DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		pthread_mutex_unlock(&var_mutex);
 	    }
 
 	    //Bubble Sort Draw Section
 	    if(DrawBubbleSort && initDraw) {
-		/*elivateSort = true;
-		if(counter != 0) DrawOutLine(size - counter - 1, SORTED_COLOR, unitGap, boxes);
-		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-		DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
-		*/
-		if(startPoint != 0) DrawOutLine(size - 1 - startPoint, SORTED_COLOR, unitGap, boxes);
+		pthread_mutex_lock(&var_mutex);
+    		if(startPoint != 0) DrawOutLine(size - 1 - startPoint, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(iterator + 1, ITERATION_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		pthread_mutex_unlock(&var_mutex);
 
 	    }
 
 	    //InsertionSort 
-	    if(DrawInsertionSort && initDraw) {
-		/*elivateSort = true;
-		if(currentTarget != size)
-		    DrawOutLine(currentTarget, ITERATION_COLOR, unitGap, boxes);
-		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-		if(startPoint < size - 1) 
-		    DrawOutLine(startPoint + 1, SORTED_COLOR, unitGap, boxes);
-		*/
+	    if(DrawInsertionSort && initDraw) {	
+		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(iterator+1, ITERATION_COLOR, unitGap, boxes);
 		if(iterator != -1) DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		pthread_mutex_unlock(&var_mutex);
 	    }
 	    
 	    //ShakerSort
 	    if(DrawShakerSort && initDraw) {
+		pthread_mutex_lock(&var_mutex);
 		if(startPoint != 0) DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
 		if(endPoint != size - 1) DrawOutLine(endPoint, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 		DrawOutLine(iterator+1, ITERATION_COLOR, unitGap, boxes);	
+		pthread_mutex_unlock(&var_mutex);
 	    }
 
-	    /*if(DrawMergeSort) {
+	    //MergeSort
+	    if(DrawMergeSort && initDraw) {
+		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(mid, SORTED_COLOR, unitGap, boxes);
-		DrawOutLine(left_start, SORTED_COLOR, unitGap, boxes);
+	    	DrawOutLine(left_start, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(right_end, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
-	    }*/
+		pthread_mutex_unlock(&var_mutex);
+	    }
 
 	    //GUI controls section
 	    //------------------------------------------------------------------------------------------------------------------|
@@ -497,7 +395,6 @@ int main(void) {
 		    DrawLine(screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
 		    //Draw Text 
 		    //DrawText(text, x, y, fontSize, Color)
-		    //
 		    DrawText("Control Sheet", sheetMarginX + frameMargin + titleMarginX, sheetMarginY + frameMargin + titleMarginY, titleFontSize, FONT_COLOR);
 		    DrawText("KEY_I - to initiate insertion sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY, fontSize, FONT_COLOR);
 		    DrawText("KEY_S - to initiate selection sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize + textGap, fontSize, FONT_COLOR);
@@ -517,6 +414,7 @@ int main(void) {
 
     CloseWindow();
     return 0;
+
 }
 
 static int Min(int x, int y) {
@@ -533,15 +431,11 @@ static void Reset() {
     startPoint = 0; 
     currentTarget = 0;
     iterator = 0;
-    //iterate = true;
-    //elivateSort = false;
     DrawSelectionSort = false;
     DrawBubbleSort = false;
     DrawInsertionSort = false;
     DrawShakerSort = false;
     DrawMergeSort = false;
-    //counter = 0;
-    //endCycle = false;
     initSort = true;
     initDraw = false;
     stopSorting = false;
@@ -582,9 +476,7 @@ static void ThreadWake() {
 
 
 static void *SelectionSortAlgo() {
-    printf("str_point: %d, itr: %d", startPoint, iterator);
     for(startPoint = 0; startPoint < size - 1; startPoint++) {
-
 	currentTarget = startPoint;
 
 	for(iterator = startPoint + 1; iterator < size; iterator++) {
@@ -593,30 +485,32 @@ static void *SelectionSortAlgo() {
 
 	    if(mat[currentTarget] > mat[iterator])
 		currentTarget = iterator;
-	    	
-		    if(stopSorting){ 
-			Reset();
-			return NULL;
+
+	    if(stopSorting){ 
+		Reset();
+		return NULL;
 				
-		    }
-		    ThreadSleep();
-
 	    }
-	    if(currentTarget != startPoint) { 
+	    ThreadSleep();
 
-		Swap(boxes, mat, currentTarget, startPoint);
-			
-		if(stopSorting) { 
-		    Reset();
-		    return NULL;	
-		}
-		ThreadSleep();	
-
-	    }
 	}
 
-	Reset();
-	return NULL;
+	if(currentTarget != startPoint) { 
+
+	    pthread_mutex_lock(&var_mutex);
+	    Swap(boxes, mat, currentTarget, startPoint);
+	    pthread_mutex_unlock(&var_mutex);
+			
+	    if(stopSorting) { 
+		Reset();
+		return NULL;	
+	    }
+	    ThreadSleep();	
+	}
+    }
+
+    Reset();
+    return NULL;
 }
 
 static void *BubbleSortAlgo() {
@@ -632,7 +526,9 @@ static void *BubbleSortAlgo() {
 	    ThreadSleep();
 
 	    if(mat[iterator] > mat[iterator + 1]) {
+		    pthread_mutex_lock(&var_mutex);
 		    Swap(boxes, mat, iterator, iterator + 1);
+		    pthread_mutex_unlock(&var_mutex);
 
 		    if(stopSorting) { 
 			Reset();
@@ -640,6 +536,7 @@ static void *BubbleSortAlgo() {
 		    }
 		    ThreadSleep();
 	    }
+
 	}
     }
 
@@ -652,7 +549,6 @@ static void *InsertionSortAlgo() {
 	iterator = startPoint - 1;
 
 	initDraw = true;
-
 	while( iterator >= 0 && mat[iterator] > mat[iterator+1]) { 
 
 	    if(stopSorting) {
@@ -679,6 +575,7 @@ static void *InsertionSortAlgo() {
 	    }
 	    ThreadSleep();
 	}
+
     }
     
     Reset();
@@ -772,6 +669,7 @@ static void *MergeSortAlgo() {
 		R[j] = mat[mid + 1 + j];
 	    }
 	    
+	    initDraw = true;
 	    for(j = 0; j<n3; j++) {
 		iterator = left_start + j;
 		ThreadSleep();
@@ -787,17 +685,17 @@ static void *MergeSortAlgo() {
 		iterator = k;
 		if(L[i] <= R[j]) {
 		    mat[k] = L[i];
-		    //pthread_mutex_lock(&var_mutex);
-		    //FreeBoxes(boxes, size);
-		    //boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
-		    //pthread_mutex_unlock(&var_mutex);
+		    pthread_mutex_lock(&var_mutex);
+		    FreeBoxes(boxes, size);
+		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		    pthread_mutex_unlock(&var_mutex);
 		    i++;
 		    ThreadSleep();
 		} else {
-		    //pthread_mutex_lock(&var_mutex);
-		    //FreeBoxes(boxes, size);
-		    //boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
-		    //pthread_mutex_unlock(&var_mutex);
+		    pthread_mutex_lock(&var_mutex);
+		    FreeBoxes(boxes, size);
+		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		    pthread_mutex_unlock(&var_mutex);
 		    mat[k] = R[j];
 		    j++;
 		    ThreadSleep();
@@ -808,10 +706,10 @@ static void *MergeSortAlgo() {
 	    while(i < n1) {
 		mat[k] = L[i];
 		iterator = k;
-		//pthread_mutex_lock(&var_mutex);
-		//FreeBoxes(boxes, size);
-		//boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
-		//pthread_mutex_unlock(&var_mutex);
+		pthread_mutex_lock(&var_mutex);
+		FreeBoxes(boxes, size);
+		boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		pthread_mutex_unlock(&var_mutex);
 		i++;
 		k++;
 		ThreadSleep();
@@ -820,18 +718,17 @@ static void *MergeSortAlgo() {
 	    while(j < n2) {
 		mat[k] = R[j];
 		iterator = k;
-		//pthread_mutex_lock(&var_mutex);
-		//FreeBoxes(boxes, size);
-		//boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
-		//pthread_mutex_unlock(&var_mutex);
+		pthread_mutex_lock(&var_mutex);
+		FreeBoxes(boxes, size);
+		boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		pthread_mutex_unlock(&var_mutex);
 		j++;
 		k++;
 		ThreadSleep();
 	    }
+	    initDraw = false;
 	}
     }
     Reset();
-    FreeBoxes(boxes, size);
-    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
     return NULL;
 }
