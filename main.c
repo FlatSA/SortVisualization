@@ -1,8 +1,7 @@
 #include<raylib.h>
 #include<stdbool.h>
-#include<stddef.h>
+#include<stddef.h> 
 #include<pthread.h>
-
 //Required for GuiControls
 #define RAYGUI_IMPLEMENTATION
 #include"raygui.h"
@@ -20,8 +19,8 @@ static const int screenWidth = 1350;
 static const int screenHeight = 680;
 static const int max = 270;
 static const int min = 5;
-static int unitWidth = 50;
-static const int shift = 2;
+static int unitWidth = 50; 
+static const int shift = 1;
 static const int heightPar = 2; 
 static const int startX = 50;
 static const int startY = screenHeight - 110;
@@ -30,13 +29,9 @@ static int triangleGap = 12;
 //Gui control panel
 static const int panelStartX = 0;
 static const int panelStartY = screenHeight - 80; 
-static const int panelWidth = screenWidth;
-static const int panelHeight = 80; 
-static const int sliderMargin = 65;
-static const int sliderHeight = 22;
+static const int panelWidth = screenWidth; static const int panelHeight = 80; static const int sliderMargin = 65; static const int sliderHeight = 22;
 static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
-static const int sliderGap = 4;
-static const int buttonWidth = 615;
+static const int sliderGap = 4; static const int buttonWidth = 615;
 static const int buttonMargin = 20;
 static const int sheetMarginX = 425;
 static const int sheetMarginY = 150;
@@ -55,18 +50,18 @@ static const int titleFontSize = 30;
 static int size = 20;
 static double sizeScale = 20;
 static int currentSize = 20; 
-static const int maxSize = 78;
+static const int maxSize = 600;
 static const int minSize = 7;
 static int* mat; 
 static int* memoryFreeFlag;
 static struct Rectangle** boxes;
 static struct Rectange* copyBoxe;
+static char size_str[10];
 
 //Input Variables
 //--------------------------------------------------------------------------------------------------|
 static int Input = 0;
-static int DuringSort = 0;
-static int SortType = none;
+static int DuringSort = 0; static int SortType = none;
 
 //Time Interval Variables
 //--------------------------------------------------------------------------------------------------|
@@ -102,17 +97,25 @@ static bool DrawBubbleSort = false;
 static bool DrawInsertionSort = false;
 //static bool endCycle = false;
 
-//Shaker Sort Variables;
+//Shaker Sort Variables
 static bool DrawShakerSort = false;
 static int  endPoint = 0;
 
+//Merge Sort Variables
+static bool DrawMergeSort = false; //?
+static int mid = 0;
+static int left_start = 0;
+static int right_end = 0;
+
 //Initializing mutex and thread ID
+pthread_mutex_t var_mutex	= PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t condition_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  condition_cond  = PTHREAD_COND_INITIALIZER;
 pthread_t sort_thread;
 
 //Functions 
 //static void Draw();
+static int Min(int x, int y);
 static void Reset();
 static void ThreadSleep();
 static void ThreadWake();
@@ -120,6 +123,8 @@ static void *SelectionSortAlgo();
 static void *BubbleSortAlgo();
 static void *InsertionSortAlgo();
 static void *ShakerSortAlgo();
+static void *MergeSortAlgo();
+static void MergeSortRec(int right, int left);
 
 int main(void) {
     
@@ -128,7 +133,8 @@ int main(void) {
     pthread_join(mainThread, NULL);*/
 
     //Initializing Main MAtrix
-    //--------------------------------------------------------------------------------------------------| triangleGap = AdjustTriangleGap(size, min, max);
+    //--------------------------------------------------------------------------------------------------| 
+    triangleGap = AdjustTriangleGap(size, min, max);
     unitWidth = AdjustUnitWidth(screenWidth, startX, shift, size);
     mat = GenerateTriangleMat(size, triangleGap); 
     boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
@@ -165,8 +171,7 @@ int main(void) {
 		    break;
 		//Begin Selection Sort    
 		case KEY_S:
-		    SortType = SelectionSort;
-		    DrawSelectionSort = true;
+		    SortType = SelectionSort; DrawSelectionSort = true;
 		    break;
 		//Begin Bubble Sort
 		case KEY_B:
@@ -185,6 +190,10 @@ int main(void) {
 		case KEY_FOUR:
 		    SortType = ShakerSort;
 		    DrawShakerSort = true;
+		    break;
+		case KEY_FIVE:
+		    SortType = MergeSort;
+		    DrawMergeSort = true;
 		    break;
 		//Close Control Sheet
 		case KEY_ENTER: 
@@ -257,8 +266,7 @@ int main(void) {
 		   
 		}*/
 		if(SortType == SelectionSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
+			if(initSort) { pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
 				initSort = false;
 			}	    
 			ThreadWake();	
@@ -341,6 +349,14 @@ int main(void) {
 			}
 			ThreadWake();
 		}	
+
+		if(SortType == MergeSort) {
+			if(initSort) {
+				pthread_create(&sort_thread, NULL, MergeSortAlgo, NULL);
+				initSort = false;
+			}
+			ThreadWake();
+		}
 	}
 
 	//Draw Section
@@ -350,9 +366,15 @@ int main(void) {
 	    //Drawing Matrix in a Current state	
 	    ClearBackground(BACK_COLOR);
 
+	    //pthread_mutex_lock(&var_mutex);
 	    for (int i = 0; i < size; i++) {
 		DrawRectangleRec(*boxes[i], UNIT_COLOR);
 	    } 
+	    //pthread_mutex_lock(&var_mutex);
+
+	    //Draw size of matrix
+	    sprintf(size_str, "%d", size);
+	    DrawText(size_str, 10, 15, 12, RAYWHITE);
 	   
 	    //Sort Iteration Section 
 	    //-------------------------------------------------------------------------------------------------------------------|
@@ -370,6 +392,7 @@ int main(void) {
 		    DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
 		}
 		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);*/
+		if(timeInterval < 0.06) DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes);
 		DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
 		if(iterator == size) DrawOutLine(iterator - 1, ITERATION_COLOR, unitGap, boxes);
@@ -410,6 +433,13 @@ int main(void) {
 		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
 		DrawOutLine(iterator+1, ITERATION_COLOR, unitGap, boxes);	
 	    }
+
+	    /*if(DrawMergeSort) {
+		DrawOutLine(mid, SORTED_COLOR, unitGap, boxes);
+		DrawOutLine(left_start, SORTED_COLOR, unitGap, boxes);
+		DrawOutLine(right_end, SORTED_COLOR, unitGap, boxes);
+		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+	    }*/
 
 	    //GUI controls section
 	    //------------------------------------------------------------------------------------------------------------------|
@@ -489,6 +519,14 @@ int main(void) {
     return 0;
 }
 
+static int Min(int x, int y) {
+	return (x<y)? x :y;
+}
+
+static int Max(int x, int y) {
+	return (x>y)? x :y;
+}
+
 static void Reset() {
     Input = 0;
     SortType = none; 
@@ -501,11 +539,33 @@ static void Reset() {
     DrawBubbleSort = false;
     DrawInsertionSort = false;
     DrawShakerSort = false;
+    DrawMergeSort = false;
     //counter = 0;
     //endCycle = false;
     initSort = true;
     initDraw = false;
     stopSorting = false;
+    mid = 0;
+    left_start = 0;
+    right_end = 0;
+
+    printf("Input: %d\n", Input);
+    printf("SortType: %d\n", SortType);
+    printf("startPoint: %d\n", startPoint);
+    printf("currentTarget: %d\n", currentTarget);
+    printf("iterator: %d\n", iterator);
+    printf("DrawSelectionSort: %d\n", DrawSelectionSort);
+    printf("DrawBubbleSort: %d\n", DrawBubbleSort);
+    printf("DrawInsertionSort: %d\n", DrawInsertionSort);
+    printf("DrawShakerSort: %d\n", DrawShakerSort);
+    printf("DrawMergeSort: %d\n", DrawMergeSort);
+    printf("initSort: %d\n", initSort);
+    printf("initDraw: %d\n", initDraw);
+    printf("stopSorting: %d\n", stopSorting);
+    printf("mid: %d\n", mid);
+    printf("left_start: %d\n", left_start);
+    printf("right_end: %d\n", right_end);
+    printf("\n");
 }
 
 static void ThreadSleep() {
@@ -686,5 +746,92 @@ static void *ShakerSortAlgo() {
     }
 
     Reset();
+    return NULL;
+}
+
+static void *MergeSortAlgo() {
+    int curr_size;
+
+    for(curr_size=1; curr_size <= size-1 ; curr_size = 2*curr_size) {
+	for(left_start = 0; left_start<size-1; left_start += 2*curr_size) {
+	    mid = Min(left_start+curr_size-1, size-1);
+
+	    right_end = Min(left_start + 2*curr_size - 1, size-1);
+
+	    int i, j, k;
+	    int n1 = mid - left_start + 1;
+	    int n2 = right_end - mid;
+	    int n3 = 0; 
+	    if(n2 < n1) n3 = n2;
+	    int L[n1], R[n2];
+
+	    for(i = 0; i<n1; i++) {
+		L[i] = mat[left_start + i];
+	    }
+	    for(j = 0; j<n2; j++) {
+		R[j] = mat[mid + 1 + j];
+	    }
+	    
+	    for(j = 0; j<n3; j++) {
+		iterator = left_start + j;
+		ThreadSleep();
+		iterator = mid + 1 + j;
+		ThreadSleep();
+	    }
+
+	    i = 0;
+	    j = 0;
+	    k = left_start;
+
+	    while(i < n1 && j < n2) {
+		iterator = k;
+		if(L[i] <= R[j]) {
+		    mat[k] = L[i];
+		    //pthread_mutex_lock(&var_mutex);
+		    //FreeBoxes(boxes, size);
+		    //boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		    //pthread_mutex_unlock(&var_mutex);
+		    i++;
+		    ThreadSleep();
+		} else {
+		    //pthread_mutex_lock(&var_mutex);
+		    //FreeBoxes(boxes, size);
+		    //boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		    //pthread_mutex_unlock(&var_mutex);
+		    mat[k] = R[j];
+		    j++;
+		    ThreadSleep();
+		}
+		k++;
+	    } 
+
+	    while(i < n1) {
+		mat[k] = L[i];
+		iterator = k;
+		//pthread_mutex_lock(&var_mutex);
+		//FreeBoxes(boxes, size);
+		//boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		//pthread_mutex_unlock(&var_mutex);
+		i++;
+		k++;
+		ThreadSleep();
+	    }
+
+	    while(j < n2) {
+		mat[k] = R[j];
+		iterator = k;
+		//pthread_mutex_lock(&var_mutex);
+		//FreeBoxes(boxes, size);
+		//boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		//pthread_mutex_unlock(&var_mutex);
+		j++;
+		k++;
+		ThreadSleep();
+	    }
+	}
+    }
+    Reset();
+    FreeBoxes(boxes, size);
+    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
     return NULL;
 }
