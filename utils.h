@@ -29,6 +29,8 @@ enum SortType {
 	BubbleSort,
 	InsertionSort,
 	ShakerSort,
+	MergeSort,
+	QuickSort,
 };
 
 void Swap(struct Rectangle** boxes, int* mat, int index1, int index2);
