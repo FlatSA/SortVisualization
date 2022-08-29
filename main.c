@@ -37,7 +37,7 @@ static const int sliderGap = 4;
 static const int buttonWidth = 615;
 static const int buttonMargin = 20;
 static const int sheetMarginX = 425; 
-static const int sheetMarginY = 150;
+static const int sheetMarginY = 100; //150
 static double showControlSheet = false;
 static const int frameMargin = 20;
 static const int textMarginX = 40;
@@ -149,7 +149,7 @@ int main(void) {
   
     //Initializing Screen and raugui style
     //--------------------------------------------------------------------------------------------------|
-    SetTargetFPS(90);
+    SetTargetFPS(84);
     InitWindow(screenWidth, screenHeight, "Let it Sort!");
     GuiLoadStyleDark();
 
@@ -218,6 +218,7 @@ int main(void) {
 		//Close Control Sheet
 		case KEY_ENTER: 
 		    if(showControlSheet) {
+			changed = true;
 			showControlSheet = false;
 		    } else {
 			showControlSheet = true;
@@ -239,11 +240,12 @@ int main(void) {
 			break; 
 		    //Close Control Sheet 
 		    case KEY_ENTER: 
-			if(showControlSheet) {
+			/*if(showControlSheet) {
 			    showControlSheet = false;
 			} else {
 			    showControlSheet = true;
-			}
+			}*/
+			showControlSheet = (showControlSheet)? false : true;
 	    }
 	}
 
@@ -325,12 +327,10 @@ int main(void) {
 	    } 
 	    pthread_mutex_unlock(&var_mutex);
 	
-
 	    //Draw size of matrix
 	    sprintf(size_str, "%d", size);
 	    DrawText(size_str, 10, 15, 12, RAYWHITE);
 	
-	   
 	    //Sort Iteration Section 
 	    //-------------------------------------------------------------------------------------------------------------------|
 	    
@@ -446,11 +446,13 @@ int main(void) {
 	    //Control Sheet Button 
 	    if(GuiButton((Rectangle){sliderMargin + sliderWidth + buttonMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, 
 				    buttonWidth, sliderHeight*2 + sliderGap}, "Show Control Sheet (Press ENTER)")) { 
-		    if(!showControlSheet) {
+		    /*if(!showControlSheet) {
 			showControlSheet = true;
 		    } else {
 			showControlSheet = false;
-		    }
+		    }*/
+		    changed = true;
+		    showControlSheet = (!showControlSheet)? true : false;
 	    }
 	    
 	    //Control Sheet set up
@@ -476,14 +478,19 @@ int main(void) {
 		    //Draw Text 
 		    //DrawText(text, x, y, fontSize, Color)
 		    DrawText("Control Sheet", sheetMarginX + frameMargin + titleMarginX, sheetMarginY + frameMargin + titleMarginY, titleFontSize, FONT_COLOR);
-		    DrawText("KEY_I - to initiate insertion sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY, fontSize, FONT_COLOR);
-		    DrawText("KEY_S - to initiate selection sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize + textGap, fontSize, FONT_COLOR);
-		    DrawText("KEY_B - to initiate bubble sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*2 + textGap*2, fontSize, FONT_COLOR);
-		    DrawText("KEY_Q - to stop current sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*3 + textGap*3, fontSize, FONT_COLOR);
-		    DrawText("KEY_N - to generate new matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*4 + textGap*4, fontSize, FONT_COLOR);
-		    DrawText("KEY_T - to generate triangle matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*5 + textGap*5, fontSize, FONT_COLOR);
-		    DrawText("KEY_ENTER - to close control sheet", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*6 + textGap*6, fontSize, FONT_COLOR);
-		    DrawText("KEY_ESC - to close application", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*7 + textGap*7, fontSize, FONT_COLOR);
+		    DrawText("KEY_1 - selection sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY, fontSize, FONT_COLOR);
+		    DrawText("KEY_2 - bubble sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize + textGap, fontSize, FONT_COLOR);
+		    DrawText("KEY_3 - insertion sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*2 + textGap*2, fontSize, FONT_COLOR);
+		    DrawText("KEY_4 - shaker sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*3 + textGap*3, fontSize, FONT_COLOR);
+		    DrawText("KEY_5 - iterative merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*4 + textGap*4, fontSize, FONT_COLOR);
+		    DrawText("KEY_6 - quick sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*5 + textGap*5, fontSize, FONT_COLOR);
+		    DrawText("KEY_7 - heap sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*6 + textGap*6, fontSize, FONT_COLOR);
+		    DrawText("KEY_Q - stop current sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*7 + textGap*7, fontSize, FONT_COLOR);
+		    DrawText("KEY_N - generate a new matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*8 + textGap*8, fontSize, FONT_COLOR);
+		    DrawText("KEY_T - generate a triangle matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*9 + textGap*9, fontSize, FONT_COLOR);
+		    DrawText("KEY_ENTER - close control sheet", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*10 + textGap*10, fontSize, FONT_COLOR);
+		    DrawText("KEY_ESC - close application", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*11 + textGap*11, fontSize, FONT_COLOR);
+
 	    }
 	 
 	EndDrawing();
@@ -497,13 +504,6 @@ int main(void) {
 
 }
 
-static int Min(int x, int y) {
-	return (x<y)? x :y;
-}
-
-static int Max(int x, int y) {
-	return (x>y)? x :y;
-}
 
 static void Reset() {
     Input = 0;
@@ -526,26 +526,6 @@ static void Reset() {
     right_end = 0;
     heap_child = 0;
     heap_parent = 0;
-
-    /*
-    printf("Input: %d\n", Input);
-    printf("SortType: %d\n", SortType);
-    printf("startPoint: %d\n", startPoint);
-    printf("currentTarget: %d\n", currentTarget);
-    printf("iterator: %d\n", iterator);
-    printf("DrawSelectionSort: %d\n", DrawSelectionSort);
-    printf("DrawBubbleSort: %d\n", DrawBubbleSort);
-    printf("DrawInsertionSort: %d\n", DrawInsertionSort);
-    printf("DrawShakerSort: %d\n", DrawShakerSort);
-    printf("DrawMergeSort: %d\n", DrawMergeSort);
-    printf("initSort: %d\n", initSort);
-    printf("initDraw: %d\n", initDraw);
-    printf("stopSorting: %d\n", stopSorting);
-    printf("mid: %d\n", mid);
-    printf("left_start: %d\n", left_start);
-    printf("right_end: %d\n", right_end);
-    printf("\n");
-    */
 }
 
 static void ThreadSleep() {
@@ -563,15 +543,32 @@ static void ThreadWake() {
 
 static void *SelectionSortAlgo() {
     changed = true;
-    for(startPoint = 0; startPoint < size - 1; startPoint++) {
-	currentTarget = startPoint;
+    initDraw = true;
+    int st;
+    int i;
+    int ct;
 
-	for(iterator = startPoint + 1; iterator < size; iterator++) {
-	    
-	    initDraw = true;
+    for(st = 0; st < size - 1; st++) {
+	ct = st;
 
-	    if(mat[currentTarget] > mat[iterator])
-		currentTarget = iterator;
+	pthread_mutex_lock(&var_mutex);
+	startPoint = st;
+	currentTarget = st;
+	pthread_mutex_unlock(&var_mutex);
+
+	for(i = st + 1; i < size; i++) {
+
+	    pthread_mutex_lock(&var_mutex);
+	    iterator = i;
+	    pthread_mutex_unlock(&var_mutex);
+
+	    if(mat[currentTarget] > mat[iterator]) {
+		ct = i;
+
+		pthread_mutex_lock(&var_mutex);
+		currentTarget = i;
+		pthread_mutex_unlock(&var_mutex);
+	    }
 
 	    if(stopSorting){ 
 		Reset();
@@ -580,7 +577,7 @@ static void *SelectionSortAlgo() {
 	    }
 	    ThreadSleep(); }
 
-	if(currentTarget != startPoint) { 
+	if(ct != st) { 
 
 	    pthread_mutex_lock(&var_mutex);
 	    Swap(boxes, mat, currentTarget, startPoint);
@@ -600,8 +597,16 @@ static void *SelectionSortAlgo() {
 
 static void *BubbleSortAlgo() {
     changed = true;
-    for(startPoint = 0; startPoint < size - 1; startPoint++) {
-	for(iterator = 0; iterator < size - 1 - startPoint; iterator++) {
+    int st;
+    int i;
+
+    for(st = 0; st < size - 1; st++) {
+	for(i = 0; i < size - 1 - st; i++) {
+
+	    pthread_mutex_lock(&var_mutex);
+	    startPoint = st;
+	    iterator = i;
+	    pthread_mutex_unlock(&var_mutex);
 	    
 	    initDraw = true;
 
@@ -611,7 +616,7 @@ static void *BubbleSortAlgo() {
 	    }
 	    ThreadSleep();
 
-	    if(mat[iterator] > mat[iterator + 1]) {
+	    if(mat[i] > mat[i + 1]) {
 		pthread_mutex_lock(&var_mutex);
 		Swap(boxes, mat, iterator, iterator + 1);
 		pthread_mutex_unlock(&var_mutex);
@@ -634,11 +639,19 @@ static void *InsertionSortAlgo() {
     int height;
     int y;
     int key;
-    for(startPoint = 1; startPoint < size; startPoint++) {
-	iterator = startPoint - 1;
+    int st;
+    int i;
+
+    for(st = 1; st < size; st++) {
+	
+	i = st - 1;
+	pthread_mutex_lock(&var_mutex);
+	startPoint = st;
+	iterator = i;
+	pthread_mutex_unlock(&var_mutex);
 
 	initDraw = true;
-	while(iterator >= 0 && mat[iterator] > mat[iterator+1]) { 
+	while(i >= 0 && mat[i] > mat[i+1]) { 
 
 	    if(stopSorting) {
 		Reset();
@@ -656,10 +669,13 @@ static void *InsertionSortAlgo() {
 	    }
 	    ThreadSleep();
 
+	    i--;
+	    pthread_mutex_lock(&var_mutex);
 	    iterator--;
+	    pthread_mutex_unlock(&var_mutex);
 	}	    
 	
-	if(iterator >= 0) {
+	if(i>= 0) {
 	    
 	    if(stopSorting) {
 		Reset();
@@ -762,19 +778,32 @@ static void *ShakerSortAlgo() {
     return NULL;
 }
 
+static int Min(int x, int y) {
+	return (x<y)? x :y;
+}
+
 static void *MergeSortAlgo() {
     changed = true;
     int curr_size;
+    int ls;
+    int re;
+    int md;
 
-    for(curr_size=1; curr_size <= size-1 ; curr_size = 2*curr_size) {
-	for(left_start = 0; left_start<size-1; left_start += 2*curr_size) {
-	    mid = Min(left_start+curr_size-1, size-1);
+    for(curr_size = 1; curr_size <= size - 1 ; curr_size = 2 * curr_size) {
+	for(ls = 0; ls<size - 1; ls += 2*curr_size) {
 
-	    right_end = Min(left_start + 2*curr_size - 1, size-1);
+	    md = Min(ls + curr_size - 1, size - 1);
+	    re = Min(ls + 2*curr_size - 1, size - 1);
+
+	    pthread_mutex_lock(&var_mutex);
+	    mid = md;
+	    left_start = ls;
+	    right_end = re;
+	    pthread_mutex_unlock(&var_mutex);
 
 	    int i, j, k;
-	    int n1 = mid - left_start + 1;
-	    int n2 = right_end - mid;
+	    int n1 = md - ls + 1;
+	    int n2 = re - md;
 	    int n3 = n2; 
 	    int L[n1], R[n2];
 
@@ -787,7 +816,10 @@ static void *MergeSortAlgo() {
 	    
 	    initDraw = true;
 	    for(j = 0; j<n3; j++) {
-		iterator = left_start + j;
+
+		pthread_mutex_lock(&var_mutex);
+		iterator = ls + j;
+		pthread_mutex_unlock(&var_mutex);
 
 		if(stopSorting) {
 		    Reset();
@@ -795,7 +827,9 @@ static void *MergeSortAlgo() {
 		}
 		ThreadSleep();
 
-		iterator = mid + 1 + j;
+		pthread_mutex_lock(&var_mutex);
+		iterator = md + 1 + j;
+		pthread_mutex_unlock(&var_mutex);
 
 		if(stopSorting) {
 		    Reset();
@@ -806,13 +840,13 @@ static void *MergeSortAlgo() {
 
 	    i = 0;
 	    j = 0;
-	    k = left_start;
+	    k = ls;
 
 	    while(i < n1 && j < n2) {
 		if(L[i] <= R[j]) {
 		    mat[k] = L[i];
-		    iterator = k;
 		    pthread_mutex_lock(&var_mutex);
+		    iterator = k;
 		    boxes[k]->height = mat[k] * heightPar;
 		    boxes[k]->y = startY - mat[k] * heightPar;
 		    pthread_mutex_unlock(&var_mutex);
@@ -825,8 +859,8 @@ static void *MergeSortAlgo() {
 		    ThreadSleep();
 		} else {
 		    mat[k] = R[j];
-		    iterator = k;
 		    pthread_mutex_lock(&var_mutex);
+		    iterator = k;
 		    boxes[k]->height = mat[k] * heightPar;
 		    boxes[k]->y = startY - mat[k] * heightPar;
 		    pthread_mutex_unlock(&var_mutex);
@@ -843,8 +877,8 @@ static void *MergeSortAlgo() {
 
 	    while(i < n1 && n2 != 0) {
 		mat[k] = L[i];
-		iterator = k;
 		pthread_mutex_lock(&var_mutex);
+		iterator = k;
 		boxes[k]->height = mat[k] * heightPar;
 		boxes[k]->y = startY - mat[k] * heightPar;
 		pthread_mutex_unlock(&var_mutex);
@@ -860,8 +894,8 @@ static void *MergeSortAlgo() {
 
 	    while(j < n2 && n1 != 0) {
 		mat[k] = R[j];
-		iterator = k;
 		pthread_mutex_lock(&var_mutex);
+		iterator = k;
 		boxes[k]->height = mat[k] * heightPar;
 		boxes[k]->y = startY - mat[k] * heightPar;
 		pthread_mutex_unlock(&var_mutex);
@@ -874,7 +908,6 @@ static void *MergeSortAlgo() {
 		}
 		ThreadSleep();
 	    }
-	    //initDraw = false;
 	}
     }
     Reset();
@@ -906,20 +939,30 @@ static int Partition(int low, int high) {
     int pivot = mat[high];
     int i = (low - 1);
 
+    pthread_mutex_lock(&var_mutex);
     startPoint = high;
     currentTarget = i;
     iterator = low;
+    pthread_mutex_unlock(&var_mutex);
+
     initDraw = true;
 
     for(int j = low; j<=high - 1; j++) {
+
+	pthread_mutex_lock(&var_mutex);
 	iterator = j;
+	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return (-1);
 	ThreadSleep();
 
 	if(mat[j] < pivot) {
 	    i++;
+	    
+	    pthread_mutex_lock(&var_mutex);
 	    currentTarget = i;
+	    pthread_mutex_unlock(&var_mutex);
+
 	    if(i != j) {
 		pthread_mutex_lock(&var_mutex);
 		Swap(boxes, mat, i, j);
@@ -937,6 +980,7 @@ static int Partition(int low, int high) {
 
     if(stopSorting) return (-1);
     ThreadSleep();
+
     return (i+1);
 }
 
@@ -961,13 +1005,17 @@ static int Heapify(int N, int i) {
 	largest = right;
 
     if(largest != i) {
+	pthread_mutex_lock(&var_mutex);
 	heap_child = i;
 	heap_parent = largest;
+	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return -1;
 	ThreadSleep();
-	//swap(&mat[i], &mat[largest]);
+
+	pthread_mutex_lock(&var_mutex);
 	Swap(boxes, mat, i, largest); 
+	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return -1;
 	ThreadSleep();
@@ -980,7 +1028,9 @@ static int Heapify(int N, int i) {
 static void *HeapSortAlgo() {
     int res;
     int N = size;
+    pthread_mutex_lock(&var_mutex);
     startPoint = N;
+    pthread_mutex_unlock(&var_mutex);
 
     for(int i = N/2 - 1; i>= 0; i--) 
 	res = Heapify(N, i);
@@ -992,8 +1042,10 @@ static void *HeapSortAlgo() {
 
     for(int i = N-1; i>= 0; i--) {
 
+	pthread_mutex_lock(&var_mutex);
 	heap_child = i;
 	heap_parent = 0;
+	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) {
 	    Reset();
@@ -1001,8 +1053,10 @@ static void *HeapSortAlgo() {
 	}
 	ThreadSleep();
 
+	pthread_mutex_lock(&var_mutex);
 	startPoint = i;
 	Swap(boxes, mat, 0, i); 
+	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) {
 	    Reset();
