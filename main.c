@@ -108,6 +108,11 @@ static int right_end = 0;
 //Quick Sort Variables
 static bool DrawQuickSort = false;
 
+//Heap Sort Variables
+static bool DrawHeapSort = false;
+static int heap_parent = 0;
+static int heap_child = 0;
+
 //Initializing mutex and thread ID
 pthread_mutex_t var_mutex	= PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t condition_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -129,6 +134,9 @@ static void *MergeSortAlgo();
 static void *QuickSortAlgo();
 static int QuickSortRec(int low, int high);
 static int Partition(int low, int high);
+static void *HeapSortAlgo();
+static int Heapify(int N, int i);
+static int Pow(int i, int j);
 
 int main(void) {
 
@@ -192,13 +200,20 @@ int main(void) {
 		    SortType = ShakerSort;
 		    DrawShakerSort = true;
 		    break;
+		//Begin Merge Sort
 		case KEY_FIVE:
 		    SortType = MergeSort;
 		    DrawMergeSort = true;
 		    break;
+		//Begin Quick Sort
 		case KEY_SIX:
 		    SortType = QuickSort;
 		    DrawQuickSort = true;
+		    break;
+		//Begin Heap Sort
+		case KEY_SEVEN:
+		    SortType = HeapSort;
+		    DrawHeapSort = true;
 		    break;
 		//Close Control Sheet
 		case KEY_ENTER: 
@@ -287,7 +302,13 @@ int main(void) {
 			ThreadWake();
 		}
 
-
+		if(SortType == HeapSort) {
+			if(initSort) {
+				pthread_create(&sort_thread, NULL, HeapSortAlgo, NULL);
+				initSort = false;
+			}
+	    		ThreadWake();
+		}
 	}
 
 	//Draw Section
@@ -362,11 +383,35 @@ int main(void) {
 		pthread_mutex_unlock(&var_mutex);
 	    }
 
-	    if(DrawQuickSort & initDraw) {
+	    //QuickSort
+	    if(DrawQuickSort && initDraw) {
 		pthread_mutex_lock(&var_mutex);
 		if(currentTarget > -1) DrawOutLine(currentTarget, SELECTION_TARGET_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		pthread_mutex_unlock(&var_mutex);
+	    }
+
+	    //HeapSort 
+	    if(DrawHeapSort && initDraw) {
+		pthread_mutex_lock(&var_mutex);
+		int i = 0;
+		int j = 0;
+		int end = 0;
+		while(i < startPoint) {
+		    i = Pow(2, j)-1;
+		    end = i * 2;
+		    if(j%2 == 0) {
+			for( ;i <= end; i++) {
+			    if(i >= startPoint) break;
+			    DrawOutLine(i, ITERATION_COLOR, unitGap, boxes);
+			} 
+		    }
+		    j++;
+		}
+		if(startPoint < size) DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
+		DrawOutLine(heap_parent, SORTED_COLOR, unitGap, boxes);
+		DrawOutLine(heap_child, SORTED_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
 
@@ -472,12 +517,15 @@ static void Reset() {
     DrawShakerSort = false;
     DrawMergeSort = false;
     DrawQuickSort = false;
+    DrawHeapSort = false;
     initSort = true;
     initDraw = false;
     stopSorting = false;
     mid = 0;
     left_start = 0;
     right_end = 0;
+    heap_child = 0;
+    heap_parent = 0;
 
     /*
     printf("Input: %d\n", Input);
@@ -530,9 +578,7 @@ static void *SelectionSortAlgo() {
 		return NULL;
 				
 	    }
-	    ThreadSleep();
-
-	}
+	    ThreadSleep(); }
 
 	if(currentTarget != startPoint) { 
 
@@ -629,15 +675,24 @@ static void *InsertionSortAlgo() {
 
 static void *ShakerSortAlgo() {
     changed = true;
+
     bool swapped = true;
-    startPoint = 0;
-    endPoint = size - 1;
+    int strP = 0;
+    int endP = size - 1;
+
+    pthread_mutex_lock(&var_mutex);
+    startPoint = strP;
+    endPoint = endP;
+    pthread_mutex_unlock(&var_mutex);
 
     while(swapped) {
 	    
 	swapped = false;
 	
-	for(iterator = startPoint; iterator < endPoint; iterator++) {
+	for(int i = strP; i < endP; i++) {
+	    pthread_mutex_lock(&var_mutex);
+	    iterator = i;
+	    pthread_mutex_unlock(&var_mutex);
 
 	    initDraw = true;
 
@@ -647,7 +702,7 @@ static void *ShakerSortAlgo() {
 	    }
 	    ThreadSleep();
 
-	    if(mat[iterator] > mat[iterator+1]) {
+	    if(mat[i] > mat[i+1]) {
 		pthread_mutex_lock(&var_mutex);
 		Swap(boxes, mat, iterator, iterator+1);
 		pthread_mutex_unlock(&var_mutex);
@@ -668,15 +723,22 @@ static void *ShakerSortAlgo() {
 	
 	swapped = false;
 
+	endP--;
+	pthread_mutex_lock(&var_mutex);
 	endPoint--;
+	pthread_mutex_unlock(&var_mutex);
 
-	for(iterator = endPoint - 1; iterator >= startPoint; iterator--) {
+	for(int i = endP - 1; i >= strP; i--) {
+	    pthread_mutex_lock(&var_mutex);
+	    iterator = i;
+	    pthread_mutex_unlock(&var_mutex);
+
 	    if(stopSorting) {
 		Reset();
 		return NULL;
 	    }
 	    ThreadSleep();
-	    if(mat[iterator] > mat[iterator+1]) {
+	    if(mat[i] > mat[i+1]) {
 		pthread_mutex_lock(&var_mutex);
 		Swap(boxes, mat, iterator, iterator+1);
 		pthread_mutex_unlock(&var_mutex);
@@ -690,7 +752,10 @@ static void *ShakerSortAlgo() {
 	    }
 	}	
 
+	strP++;
+	pthread_mutex_lock(&var_mutex);
 	startPoint++;
+	pthread_mutex_unlock(&var_mutex);
     }
 
     Reset();
@@ -879,5 +944,90 @@ static void swap(int* a, int* b) {
     int k = *b;
     *b = *a;
     *a = k;
+}
+
+static int Heapify(int N, int i) {
+    changed = true;
+    initDraw = true;
+    
+    int largest = i;
+    int left = 2*i + 1;
+    int right = 2*i + 2;
+
+    if(left < N && mat[left] > mat[largest])
+	largest = left;
+
+    if(right < N && mat[right] > mat[largest])
+	largest = right;
+
+    if(largest != i) {
+	heap_child = i;
+	heap_parent = largest;
+
+	if(stopSorting) return -1;
+	ThreadSleep();
+	//swap(&mat[i], &mat[largest]);
+	Swap(boxes, mat, i, largest); 
+
+	if(stopSorting) return -1;
+	ThreadSleep();
+
+	Heapify(N, largest);
+    }
+    return 0;
+}
+
+static void *HeapSortAlgo() {
+    int res;
+    int N = size;
+    startPoint = N;
+
+    for(int i = N/2 - 1; i>= 0; i--) 
+	res = Heapify(N, i);
+
+    if(res == -1) {
+	Reset();
+	return NULL;
+    }
+
+    for(int i = N-1; i>= 0; i--) {
+
+	heap_child = i;
+	heap_parent = 0;
+
+	if(stopSorting) {
+	    Reset();
+	    return NULL;
+	}
+	ThreadSleep();
+
+	startPoint = i;
+	Swap(boxes, mat, 0, i); 
+
+	if(stopSorting) {
+	    Reset();
+	    return NULL;
+	}
+	ThreadSleep();
+
+	res = Heapify(i, 0); 
+	if(res == -1) {
+	    Reset();
+	    return NULL;
+	}
+
+    }
+
+    Reset();
+    return NULL;
+}
+
+static int Pow(int i, int j){
+    if(j == 0) return 1;
+    int res = 1;
+    for(int x = 0; x <= j-1; x++) {
+	res *= i;
+    }
+    return res;
 }
 
