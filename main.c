@@ -24,6 +24,7 @@ static const int startX = 50;
 static const int startY = screenHeight - 110;
 static const int unitGap = 0;
 static int triangleGap = 12;
+static int changed = true;
 //Gui control panel
 static const int panelStartX = 0;
 static const int panelStartY = screenHeight - 80; 
@@ -52,7 +53,7 @@ static const int titleFontSize = 30;
 static int size = 20;
 static double sizeScale = 20;
 static int currentSize = 20; 
-static const int maxSize = 1245;
+static const int maxSize = 249;
 static const int minSize = 7;
 static int* mat; 
 static int* memoryFreeFlag; static struct Rectangle** boxes;
@@ -158,6 +159,7 @@ int main(void) {
 		    FreeSpace(mat, boxes, size);
 		    mat = GenerateMat(size, max, min);
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		    changed = true;
 		    Input = 0;
 		    break;
 		//Generate Triangle Matrix
@@ -166,6 +168,7 @@ int main(void) {
 		    triangleGap = AdjustTriangleGap(size, min, max);
 		    mat = GenerateTriangleMat(size, triangleGap); 
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
+		    changed = true;
 		    Input = 0;
 		    break;
 		//Begin Selection Sort    
@@ -290,7 +293,8 @@ int main(void) {
 	//Draw Section
 	//----------------------------------------------------------------------------------------------|
     	BeginDrawing();
-	  
+	if(changed) {  
+
 	    //Drawing Matrix in a Current state	
 	    ClearBackground(BACK_COLOR);
 
@@ -299,10 +303,12 @@ int main(void) {
 		DrawRectangleRec(*boxes[i], UNIT_COLOR);
 	    } 
 	    pthread_mutex_unlock(&var_mutex);
+	
 
 	    //Draw size of matrix
 	    sprintf(size_str, "%d", size);
 	    DrawText(size_str, 10, 15, 12, RAYWHITE);
+	
 	   
 	    //Sort Iteration Section 
 	    //-------------------------------------------------------------------------------------------------------------------|
@@ -364,6 +370,9 @@ int main(void) {
 		pthread_mutex_unlock(&var_mutex);
 	    }
 
+	    if(!initDraw && (deltaTime > timeInterval)) changed = false;
+	}
+
 	    //GUI controls section
 	    //------------------------------------------------------------------------------------------------------------------|
 
@@ -377,6 +386,7 @@ int main(void) {
 	    if(SortType == none) {
 		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
 		if(size  != (int)sizeScale) {
+			changed = true;
 			size = (int)sizeScale;
 			memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
 			free(mat);
@@ -461,6 +471,7 @@ static void Reset() {
     DrawInsertionSort = false;
     DrawShakerSort = false;
     DrawMergeSort = false;
+    DrawQuickSort = false;
     initSort = true;
     initDraw = false;
     stopSorting = false;
@@ -503,6 +514,7 @@ static void ThreadWake() {
 
 
 static void *SelectionSortAlgo() {
+    changed = true;
     for(startPoint = 0; startPoint < size - 1; startPoint++) {
 	currentTarget = startPoint;
 
@@ -541,6 +553,7 @@ static void *SelectionSortAlgo() {
 }
 
 static void *BubbleSortAlgo() {
+    changed = true;
     for(startPoint = 0; startPoint < size - 1; startPoint++) {
 	for(iterator = 0; iterator < size - 1 - startPoint; iterator++) {
 	    
@@ -571,6 +584,7 @@ static void *BubbleSortAlgo() {
 }
 
 static void *InsertionSortAlgo() {
+    changed = true;
     int height;
     int y;
     int key;
@@ -614,6 +628,7 @@ static void *InsertionSortAlgo() {
 }
 
 static void *ShakerSortAlgo() {
+    changed = true;
     bool swapped = true;
     startPoint = 0;
     endPoint = size - 1;
@@ -683,6 +698,7 @@ static void *ShakerSortAlgo() {
 }
 
 static void *MergeSortAlgo() {
+    changed = true;
     int curr_size;
 
     for(curr_size=1; curr_size <= size-1 ; curr_size = 2*curr_size) {
@@ -793,7 +809,7 @@ static void *MergeSortAlgo() {
 		}
 		ThreadSleep();
 	    }
-	    initDraw = false;
+	    //initDraw = false;
 	}
     }
     Reset();
@@ -821,6 +837,7 @@ static int QuickSortRec(int low, int high) {
 }
 
 static int Partition(int low, int high) {
+    changed = true;
     int pivot = mat[high];
     int i = (low - 1);
 
