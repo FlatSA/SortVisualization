@@ -15,11 +15,10 @@
 //--------------------------------------------------------------------------------------------------|
 static const int screenWidth = 1350;
 static const int screenHeight = 680;
-static const int max = 270;
+static const int max = 550;
 static const int min = 5;
-static int unitWidth = 50; 
-static const int shift = 1;
-static const int heightPar = 2; 
+static int unitWidth = 50; static const int shift = 1;
+static const int heightPar = 1; 
 static const int startX = 50;
 static const int startY = screenHeight - 110;
 static const int unitGap = 0;
@@ -53,7 +52,7 @@ static const int titleFontSize = 30;
 static int size = 20;
 static double sizeScale = 20;
 static int currentSize = 20; 
-static const int maxSize = 249;
+static const int maxSize = 1000;
 static const int minSize = 7;
 static int* mat; 
 static int* memoryFreeFlag; static struct Rectangle** boxes;
@@ -100,7 +99,8 @@ static bool DrawShakerSort = false;
 static int  endPoint = 0;
 
 //Merge Sort Variables
-static bool DrawMergeSort = false; //?
+static bool DrawRecMergeSort = false;
+static bool DrawItMergeSort = false; 
 static int mid = 0;
 static int left_start = 0;
 static int right_end = 0;
@@ -112,6 +112,14 @@ static bool DrawQuickSort = false;
 static bool DrawHeapSort = false;
 static int heap_parent = 0;
 static int heap_child = 0;
+
+//Radix Sort Variables 
+static bool DrawRadixSort = false;
+static int countInd[10] = {0};
+static bool showIndex = false;
+static int chIn = 0;
+static int frIn = 0;
+
 
 //Initializing mutex and thread ID
 pthread_mutex_t var_mutex	= PTHREAD_MUTEX_INITIALIZER;
@@ -130,13 +138,19 @@ static void *SelectionSortAlgo();
 static void *BubbleSortAlgo();
 static void *InsertionSortAlgo();
 static void *ShakerSortAlgo();
-static void *MergeSortAlgo();
+static void *ItMergeSortAlgo();
+static void *RecMergeSortAlgo();
+static int MergeSortRec(int l, int r);
+static int Merge(int l, int m, int r);
 static void *QuickSortAlgo();
 static int QuickSortRec(int low, int high);
 static int Partition(int low, int high);
 static void *HeapSortAlgo();
 static int Heapify(int N, int i);
 static int Pow(int i, int j);
+static void *RadixSortAlgo();
+static void CountSort(int exp);
+static int getMax();
 
 int main(void) {
 
@@ -149,7 +163,7 @@ int main(void) {
   
     //Initializing Screen and raugui style
     //--------------------------------------------------------------------------------------------------|
-    SetTargetFPS(84);
+    SetTargetFPS(300);
     InitWindow(screenWidth, screenHeight, "Let it Sort!");
     GuiLoadStyleDark();
 
@@ -199,21 +213,28 @@ int main(void) {
 		case KEY_FOUR:
 		    SortType = ShakerSort;
 		    DrawShakerSort = true;
-		    break;
-		//Begin Merge Sort
+		    break; //Begin Merge Sort
 		case KEY_FIVE:
-		    SortType = MergeSort;
-		    DrawMergeSort = true;
+		    SortType = ItMergeSort;
+		    DrawItMergeSort = true;
+		    break;
+		case KEY_SIX:
+		    SortType = RecMergeSort;
+		    DrawRecMergeSort = true;
 		    break;
 		//Begin Quick Sort
-		case KEY_SIX:
+		case KEY_SEVEN:
 		    SortType = QuickSort;
 		    DrawQuickSort = true;
 		    break;
 		//Begin Heap Sort
-		case KEY_SEVEN:
+		case KEY_EIGHT:
 		    SortType = HeapSort;
 		    DrawHeapSort = true;
+		    break;
+		case KEY_NINE:
+		    SortType = RadixSort;
+		    DrawRadixSort = true;
 		    break;
 		//Close Control Sheet
 		case KEY_ENTER: 
@@ -288,9 +309,17 @@ int main(void) {
 			ThreadWake();
 		}	
 
-		if(SortType == MergeSort) {
+		if(SortType == ItMergeSort) {
 			if(initSort) {
-				pthread_create(&sort_thread, NULL, MergeSortAlgo, NULL);
+				pthread_create(&sort_thread, NULL, ItMergeSortAlgo, NULL);
+				initSort = false;
+			}
+			ThreadWake();
+		}
+
+		if(SortType == RecMergeSort) {
+			if(initSort) {
+				pthread_create(&sort_thread, NULL, RecMergeSortAlgo, NULL); 
 				initSort = false;
 			}
 			ThreadWake();
@@ -310,6 +339,14 @@ int main(void) {
 				initSort = false;
 			}
 	    		ThreadWake();
+		}
+
+		if(SortType == RadixSort) {
+			if(initSort) {
+				pthread_create(&sort_thread, NULL, RadixSortAlgo, NULL);
+				initSort = false;
+			}
+			ThreadWake();
 		}
 	}
 
@@ -374,7 +411,7 @@ int main(void) {
 	    }
 
 	    //MergeSort
-	    if(DrawMergeSort && initDraw) {
+	    if((DrawItMergeSort || DrawRecMergeSort) && initDraw) {
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(mid, SORTED_COLOR, unitGap, boxes);
 	    	DrawOutLine(left_start, SELECTION_TARGET_COLOR, unitGap, boxes);
@@ -412,6 +449,19 @@ int main(void) {
 		if(startPoint < size) DrawOutLine(startPoint, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(heap_parent, SORTED_COLOR, unitGap, boxes);
 		DrawOutLine(heap_child, SORTED_COLOR, unitGap, boxes);
+		pthread_mutex_unlock(&var_mutex);
+	    }
+
+	    if(DrawRadixSort && initDraw) {
+		pthread_mutex_lock(&var_mutex);
+		if(showIndex) {
+		    for(int i = 1; i < 10; i++)
+			if(countInd[i] < size) DrawOutLine(countInd[i], SELECTION_TARGET_COLOR, unitGap, boxes);
+		    DrawOutLine(chIn, SORTED_COLOR, unitGap, boxes);
+		    DrawOutLine(frIn, SORTED_COLOR, unitGap, boxes);
+		} else {
+		    DrawOutLine(iterator, ITERATION_COLOR, unitGap, boxes);
+		}
 		pthread_mutex_unlock(&var_mutex);
 	    }
 
@@ -483,13 +533,14 @@ int main(void) {
 		    DrawText("KEY_3 - insertion sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*2 + textGap*2, fontSize, FONT_COLOR);
 		    DrawText("KEY_4 - shaker sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*3 + textGap*3, fontSize, FONT_COLOR);
 		    DrawText("KEY_5 - iterative merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*4 + textGap*4, fontSize, FONT_COLOR);
-		    DrawText("KEY_6 - quick sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*5 + textGap*5, fontSize, FONT_COLOR);
-		    DrawText("KEY_7 - heap sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*6 + textGap*6, fontSize, FONT_COLOR);
-		    DrawText("KEY_Q - stop current sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*7 + textGap*7, fontSize, FONT_COLOR);
-		    DrawText("KEY_N - generate a new matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*8 + textGap*8, fontSize, FONT_COLOR);
-		    DrawText("KEY_T - generate a triangle matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*9 + textGap*9, fontSize, FONT_COLOR);
-		    DrawText("KEY_ENTER - close control sheet", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*10 + textGap*10, fontSize, FONT_COLOR);
-		    DrawText("KEY_ESC - close application", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*11 + textGap*11, fontSize, FONT_COLOR);
+		    DrawText("KEY_6 - recursive merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*5 + textGap*5, fontSize, FONT_COLOR);
+		    DrawText("KEY_7 - quick sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*6 + textGap*6, fontSize, FONT_COLOR);
+		    DrawText("KEY_8 - heap sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*7 + textGap*7, fontSize, FONT_COLOR);
+		    DrawText("KEY_Q - stop current sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*8 + textGap*8, fontSize, FONT_COLOR);
+		    DrawText("KEY_N - generate a new matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*9 + textGap*9, fontSize, FONT_COLOR);
+		    DrawText("KEY_T - generate a triangle matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*10 + textGap*10, fontSize, FONT_COLOR);
+		    DrawText("KEY_ENTER - close control sheet", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*11 + textGap*11, fontSize, FONT_COLOR);
+		    DrawText("KEY_ESC - close application", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*12 + textGap*12, fontSize, FONT_COLOR);
 
 	    }
 	 
@@ -515,7 +566,8 @@ static void Reset() {
     DrawBubbleSort = false;
     DrawInsertionSort = false;
     DrawShakerSort = false;
-    DrawMergeSort = false;
+    DrawItMergeSort = false;
+    DrawRecMergeSort = false;
     DrawQuickSort = false;
     DrawHeapSort = false;
     initSort = true;
@@ -523,8 +575,7 @@ static void Reset() {
     stopSorting = false;
     mid = 0;
     left_start = 0;
-    right_end = 0;
-    heap_child = 0;
+    right_end = 0; heap_child = 0;
     heap_parent = 0;
 }
 
@@ -782,7 +833,7 @@ static int Min(int x, int y) {
 	return (x<y)? x :y;
 }
 
-static void *MergeSortAlgo() {
+static void *ItMergeSortAlgo() {
     changed = true;
     int curr_size;
     int ls;
@@ -910,6 +961,130 @@ static void *MergeSortAlgo() {
 	    }
 	}
     }
+    Reset();
+    return NULL;
+}
+
+static int Merge(int l, int m, int r) {
+
+    pthread_mutex_lock(&var_mutex);
+    left_start = l;
+    mid = m;
+    right_end = r;
+    pthread_mutex_unlock(&var_mutex);
+
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    int n3 = n2; 
+    int L[n1], R[n2];
+
+    for(i = 0; i<n1; i++) {
+	L[i] = mat[left_start + i];
+    }
+    for(j = 0; j<n2; j++) {
+	R[j] = mat[mid + 1 + j];
+    }
+	    
+    initDraw = true;
+    for(j = 0; j<n3; j++) {
+
+	pthread_mutex_lock(&var_mutex);
+	iterator = l + j;
+	pthread_mutex_unlock(&var_mutex);
+
+	if(stopSorting) return -1; 
+	ThreadSleep();
+
+	pthread_mutex_lock(&var_mutex);
+	iterator = m + 1 + j;
+	pthread_mutex_unlock(&var_mutex);
+
+	if(stopSorting) return -1;
+	ThreadSleep();
+    }
+
+    i = 0;
+    j = 0;
+    k = l;
+
+    while(i < n1 && j < n2) {
+	if(L[i] <= R[j]) {
+	    mat[k] = L[i];
+	    pthread_mutex_lock(&var_mutex);
+	    iterator = k;
+	    boxes[k]->height = mat[k] * heightPar;
+	    boxes[k]->y = startY - mat[k] * heightPar;
+	    pthread_mutex_unlock(&var_mutex);
+	    i++;
+
+	    if(stopSorting) return -1;
+	    ThreadSleep();
+	} else {
+	    mat[k] = R[j];
+	    pthread_mutex_lock(&var_mutex);
+	    iterator = k;
+	    boxes[k]->height = mat[k] * heightPar;
+	    boxes[k]->y = startY - mat[k] * heightPar;
+	    pthread_mutex_unlock(&var_mutex);
+	    j++;
+
+	    if(stopSorting) return -1;
+	    ThreadSleep();
+	}
+	k++;
+    } 
+
+    while(i < n1 && n2 != 0) {
+	mat[k] = L[i];
+	pthread_mutex_lock(&var_mutex);
+	iterator = k;
+	boxes[k]->height = mat[k] * heightPar;
+	boxes[k]->y = startY - mat[k] * heightPar;
+	pthread_mutex_unlock(&var_mutex);
+	i++;
+	k++;
+
+	if(stopSorting) return -1;
+	ThreadSleep();
+    }
+
+    while(j < n2 && n1 != 0) {
+	mat[k] = R[j];
+	pthread_mutex_lock(&var_mutex);
+	iterator = k;
+	boxes[k]->height = mat[k] * heightPar;
+	boxes[k]->y = startY - mat[k] * heightPar;
+	pthread_mutex_unlock(&var_mutex);
+	j++;
+	k++;
+
+	if(stopSorting) return -1;
+	ThreadSleep();
+    }
+    return 0;
+}
+ 
+
+
+static int MergeSortRec(int l, int r) {
+    changed = true;
+    if(l < r) {
+	int md = l + (r - l)/2;
+	int res;
+
+	res = MergeSortRec(l, md);
+	if(res == -1) return - 1;
+	res = MergeSortRec(md+1, r);
+	if(res == -1) return -1;
+	res = Merge(l, md, r);
+	if(res == -1) return - 1;
+    }
+    return 0;
+}
+
+static void *RecMergeSortAlgo() {
+    MergeSortRec(0, size-1); 
     Reset();
     return NULL;
 }
@@ -1085,3 +1260,73 @@ static int Pow(int i, int j){
     return res;
 }
 
+int getMax(int n) {
+    int mx = mat[0];
+    for(int i = 1; i < n; i++) 
+	if(mat[i] > mx)
+	    mx = mat[i];
+    return mx;
+}
+
+static void CountSort(int exp) {
+    int output[size];
+    int copy[size];
+    int i, count[10] = {0};
+
+    for(i = 0; i < size; i++) {
+	pthread_mutex_lock(&var_mutex);
+	iterator = i;
+	pthread_mutex_unlock(&var_mutex);
+	count[(mat[i] / exp) % 10]++;
+	ThreadSleep();
+    }
+
+    for(i = 1; i < 10; i++) {
+	count[i] += count[i-1];
+    }
+
+    for(i = 9; i >=1 ; i--) {
+	count[i] = count[i-1];
+    }
+    count[0] = 0;
+
+    for(i = 0; i < 10; i++) {
+	countInd[i] = count[i];
+    }
+
+    showIndex = true;
+
+    for(i = 0; i < size; i++) {
+	copy[i] = mat[i];
+    }
+
+    for(i = 0; i < size; i++) {
+	pthread_mutex_lock(&var_mutex);
+	chIn = count[(copy[i]/ exp) % 10];
+	frIn = i;
+	pthread_mutex_unlock(&var_mutex);
+
+	ThreadSleep();
+	mat[count[(copy[i]/ exp) % 10]] = copy[i];
+	pthread_mutex_lock(&var_mutex);
+	boxes[count[(copy[i]/ exp) % 10]]->height = copy[i] * heightPar;
+	boxes[count[(copy[i]/ exp) % 10]]->y = startY - copy[i] * heightPar;
+	pthread_mutex_unlock(&var_mutex);
+	count[(copy[i]/ exp) %10]++;
+	ThreadSleep();
+    }
+    showIndex = false;
+} 
+
+
+static void * RadixSortAlgo() {
+    initDraw = true;
+    changed = true;
+    int m = getMax(size);
+
+    for(int exp = 1; m / exp > 0; exp *= 10)
+	CountSort(exp);
+
+    Reset();
+    return NULL;
+}
