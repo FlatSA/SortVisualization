@@ -6,12 +6,15 @@
 #define UNIT_COLOR (Color){255, 90, 100, 255} 
 #define PANEL_COLOR (Color){60, 60, 60, 220}
 #define BACK_COLOR (Color){42, 40, 40, 255}
-#define SELECTION_TARGET_COLOR (Color){255, 240, 177, 255}
-#define ITERATION_COLOR (Color){245, 245, 245, 220}
-#define SORTED_COLOR (Color){144, 238, 133, 250}
-#define MENU_INNER_GRAY (Color){65, 65, 65, 255}
-#define MENU_OUTER_GRAY (Color){55, 55, 55, 255}
-#define MENU_OUTLINE_COLOR (Color){200, 200, 210, 250}
+#define LIGHT_YELLOW_COLOR (Color){255, 240, 177, 255}
+#define LIGHT_WHITE_COLOR (Color){245, 245, 245, 220}
+#define YELLOW_COLOR (Color){138, 121, 39, 255}
+#define LIGHT_GREY (Color){204, 204, 255, 255}
+#define GREEN_COLOR (Color){144, 238, 133, 250}
+#define DARK_RED (Color){124, 36, 46, 255}
+//#define MENU_INNER_GRAY (Color){65, 65, 65, 255}
+//#define MENU_OUTER_GRAY (Color){55, 55, 55, 255}
+#define MENU_OUTLINE_COLOR (Color){190, 200, 210, 250}
 #define FONT_COLOR (Color) {225, 225, 225, 250}
 
 #endif
