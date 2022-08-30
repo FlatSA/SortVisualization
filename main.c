@@ -149,7 +149,7 @@ static void *HeapSortAlgo();
 static int Heapify(int N, int i);
 static int Pow(int i, int j);
 static void *RadixSortAlgo();
-static void CountSort(int exp);
+static int CountSort(int exp);
 static int getMax();
 
 int main(void) {
@@ -1268,7 +1268,7 @@ int getMax(int n) {
     return mx;
 }
 
-static void CountSort(int exp) {
+static int CountSort(int exp) {
     int output[size];
     int copy[size];
     int i, count[10] = {0};
@@ -1278,6 +1278,8 @@ static void CountSort(int exp) {
 	iterator = i;
 	pthread_mutex_unlock(&var_mutex);
 	count[(mat[i] / exp) % 10]++;
+
+	if(stopSorting) return -1;
 	ThreadSleep();
     }
 
@@ -1306,16 +1308,21 @@ static void CountSort(int exp) {
 	frIn = i;
 	pthread_mutex_unlock(&var_mutex);
 
+	if(stopSorting) return -1;
 	ThreadSleep();
+
 	mat[count[(copy[i]/ exp) % 10]] = copy[i];
 	pthread_mutex_lock(&var_mutex);
 	boxes[count[(copy[i]/ exp) % 10]]->height = copy[i] * heightPar;
 	boxes[count[(copy[i]/ exp) % 10]]->y = startY - copy[i] * heightPar;
 	pthread_mutex_unlock(&var_mutex);
 	count[(copy[i]/ exp) %10]++;
+
+	if(stopSorting) return -1;
 	ThreadSleep();
     }
     showIndex = false;
+    return 0;
 } 
 
 
@@ -1323,9 +1330,12 @@ static void * RadixSortAlgo() {
     initDraw = true;
     changed = true;
     int m = getMax(size);
+    int res = 0;
 
-    for(int exp = 1; m / exp > 0; exp *= 10)
-	CountSort(exp);
+    for(int exp = 1; m / exp > 0; exp *= 10) {
+	res = CountSort(exp);
+	if(res == -1) break;
+    }
 
     Reset();
     return NULL;
