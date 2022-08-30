@@ -2,6 +2,7 @@
 #include<stdbool.h>
 #include<stddef.h> 
 #include<pthread.h>
+#include<time.h>
 //Required for GuiControls
 #define RAYGUI_IMPLEMENTATION 
 #include "raygui.h" 
@@ -17,14 +18,15 @@ static const int screenWidth = 1350;
 static const int screenHeight = 680;
 static const int max = 550;
 static const int min = 5;
-static int unitWidth = 50; static const int shift = 1;
+static int unitWidth = 50; 
+static const int shift = 1;
 static const int heightPar = 1; 
 static const int startX = 50;
 static const int startY = screenHeight - 110;
 static const int unitGap = 0;
 static int triangleGap = 12;
 static int changed = true;
-//Gui control panel
+//Gui control panel 
 static const int panelStartX = 0;
 static const int panelStartY = screenHeight - 80; 
 static const int panelWidth = screenWidth; 
@@ -68,10 +70,10 @@ static int DuringSort = 0; static int SortType = none;
 //--------------------------------------------------------------------------------------------------|
 static double currentTime = 0;
 static double deltaTime = 0.f;
-static double timeInterval = 0.20;
+static double timeInterval = 0.500;
 static double timeScale = 0.25;
-static const double maxInterval = 0.600;
-static const double minInterval = 0.;
+static const double maxInterval = 1.000;
+static const double minInterval = 0.015;
 
 //Common Sort Variables
 //--------------------------------------------------------------------------------------------------|
@@ -126,6 +128,7 @@ pthread_mutex_t var_mutex	= PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t condition_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  condition_cond  = PTHREAD_COND_INITIALIZER;
 pthread_t sort_thread;
+static struct timespec delta; 
 
 //Functions 
 //static void Draw();
@@ -279,10 +282,11 @@ int main(void) {
 		currentTime = GetTime();
 		
 		if(SortType == SelectionSort) {
-			if(initSort) { pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
+			if(initSort) { 
+				pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
 				initSort = false;
 			}	    
-			ThreadWake();	
+			//ThreadWake();	
 		}
 
 		if(SortType == BubbleSort) {
@@ -290,7 +294,7 @@ int main(void) {
 				pthread_create(&sort_thread, NULL, BubbleSortAlgo, NULL);
 				initSort = false;
 			}
-			ThreadWake();
+			//ThreadWake();
 		}
 
 		if(SortType == InsertionSort) {
@@ -298,14 +302,15 @@ int main(void) {
 				pthread_create(&sort_thread, NULL, InsertionSortAlgo, NULL);
 				initSort = false;
 			}
-			ThreadWake();	
+			//ThreadWake();	
 		}
 
 		if(SortType == ShakerSort) {
 			if(initSort) {
 				pthread_create(&sort_thread, NULL, ShakerSortAlgo, NULL);
 				initSort = false;
-			} ThreadWake();
+			} 
+			//ThreadWake();
 		}	
 
 		if(SortType == ItMergeSort) {
@@ -313,7 +318,7 @@ int main(void) {
 				pthread_create(&sort_thread, NULL, ItMergeSortAlgo, NULL);
 				initSort = false;
 			}
-			ThreadWake();
+			//ThreadWake();
 		}
 
 		if(SortType == RecMergeSort) {
@@ -321,7 +326,7 @@ int main(void) {
 				pthread_create(&sort_thread, NULL, RecMergeSortAlgo, NULL); 
 				initSort = false;
 			}
-			ThreadWake();
+			//ThreadWake();
 		}
 
 		if(SortType == QuickSort) {
@@ -329,7 +334,7 @@ int main(void) {
 				pthread_create(&sort_thread, NULL, QuickSortAlgo, NULL);
 				initSort = false;
 			}
-			ThreadWake();
+			//ThreadWake();
 		}
 
 		if(SortType == HeapSort) {
@@ -337,7 +342,7 @@ int main(void) {
 				pthread_create(&sort_thread, NULL, HeapSortAlgo, NULL);
 				initSort = false;
 			}
-	    		ThreadWake();
+	    		//ThreadWake();
 		}
 
 		if(SortType == RadixSort) {
@@ -345,7 +350,7 @@ int main(void) {
 				pthread_create(&sort_thread, NULL, RadixSortAlgo, NULL);
 				initSort = false;
 			}
-			ThreadWake();
+			//ThreadWake();
 		}
 	}
 
@@ -589,10 +594,17 @@ static void ThreadWake() {
     pthread_mutex_unlock(&condition_mutex);
 }
 
+static void SetDelta() {
+    pthread_mutex_lock(&var_mutex);
+    delta.tv_sec = 0;
+    delta.tv_nsec = timeInterval * Pow(10, 8);
+    pthread_mutex_unlock(&var_mutex);
+}
 
 static void *SelectionSortAlgo() {
     changed = true;
     initDraw = true;
+    
     int st;
     int i;
     int ct;
@@ -624,7 +636,10 @@ static void *SelectionSortAlgo() {
 		return NULL;
 				
 	    }
-	    ThreadSleep(); }
+	    //ThreadSleep(); 
+	    SetDelta();
+	    nanosleep(&delta, &delta);
+	}
 
 	if(ct != st) { 
 
@@ -636,7 +651,9 @@ static void *SelectionSortAlgo() {
 		Reset();
 		return NULL;	
 	    }
-	    ThreadSleep();	
+	    //ThreadSleep();	
+	    SetDelta();
+	    nanosleep(&delta, &delta);
 	}
     }
 
@@ -646,6 +663,7 @@ static void *SelectionSortAlgo() {
 
 static void *BubbleSortAlgo() {
     changed = true;
+    initDraw = true;
     int st;
     int i;
 
@@ -657,13 +675,13 @@ static void *BubbleSortAlgo() {
 	    iterator = i;
 	    pthread_mutex_unlock(&var_mutex);
 	    
-	    initDraw = true;
-
 	    if(stopSorting) { 
 		Reset();
 		return NULL;	
 	    }
-	    ThreadSleep();
+	    //ThreadSleep();
+	    SetDelta();
+	    nanosleep(&delta, &delta);
 
 	    if(mat[i] > mat[i + 1]) {
 		pthread_mutex_lock(&var_mutex);
@@ -674,7 +692,9 @@ static void *BubbleSortAlgo() {
 		    Reset();
 		    return NULL;	
 		}
-		ThreadSleep();
+		//ThreadSleep();
+		SetDelta();
+		nanosleep(&delta, &delta);
 	    }
 	}
     }
@@ -706,7 +726,9 @@ static void *InsertionSortAlgo() {
 		Reset();
 		return NULL;
 	    }
-	    ThreadSleep();
+	    //ThreadSleep();
+	    SetDelta();
+	    nanosleep(&delta, &delta);
 
 	    pthread_mutex_lock(&var_mutex);
 	    Swap(boxes, mat, iterator, iterator+1);
@@ -716,7 +738,9 @@ static void *InsertionSortAlgo() {
 		Reset();
 		return NULL;
 	    }
-	    ThreadSleep();
+	    //ThreadSleep();
+	    SetDelta();
+	    nanosleep(&delta, &delta);
 
 	    i--;
 	    pthread_mutex_lock(&var_mutex);
@@ -730,7 +754,9 @@ static void *InsertionSortAlgo() {
 		Reset();
 		return NULL;
 	    }
-	    ThreadSleep();
+	    //ThreadSleep();
+	    SetDelta();
+	    nanosleep(&delta, &delta);
 	}
     }
     
@@ -765,7 +791,9 @@ static void *ShakerSortAlgo() {
 		Reset();
 		return NULL;
 	    }
-	    ThreadSleep();
+	    //ThreadSleep();
+	    SetDelta();
+	    nanosleep(&delta, &delta);
 
 	    if(mat[i] > mat[i+1]) {
 		pthread_mutex_lock(&var_mutex);
@@ -777,7 +805,9 @@ static void *ShakerSortAlgo() {
 		    Reset();
 		    return NULL;
 		}
-		ThreadSleep();
+		//ThreadSleep();
+		SetDelta();
+		nanosleep(&delta, &delta);
 	    }
 	}
 
@@ -802,7 +832,10 @@ static void *ShakerSortAlgo() {
 		Reset();
 		return NULL;
 	    }
-	    ThreadSleep();
+	    //ThreadSleep();
+	    SetDelta();
+	    nanosleep(&delta, &delta);
+
 	    if(mat[i] > mat[i+1]) {
 		pthread_mutex_lock(&var_mutex);
 		Swap(boxes, mat, iterator, iterator+1);
@@ -813,7 +846,9 @@ static void *ShakerSortAlgo() {
 		    Reset();
 		    return NULL;
 		}
-		ThreadSleep();
+		//ThreadSleep();
+		SetDelta();
+		nanosleep(&delta, &delta);
 	    }
 	}	
 
@@ -874,7 +909,9 @@ static void *ItMergeSortAlgo() {
 		    Reset();
 		    return NULL;
 		}
-		ThreadSleep();
+		//ThreadSleep();
+		SetDelta();
+		nanosleep(&delta, &delta);
 
 		pthread_mutex_lock(&var_mutex);
 		iterator = md + 1 + j;
@@ -884,7 +921,9 @@ static void *ItMergeSortAlgo() {
 		    Reset();
 		    return NULL;
 		}
-		ThreadSleep();
+		//ThreadSleep();
+		SetDelta();
+		nanosleep(&delta, &delta);
 	    }
 
 	    i = 0;
@@ -905,7 +944,9 @@ static void *ItMergeSortAlgo() {
 			Reset();
 			return NULL;
 		    }
-		    ThreadSleep();
+		    //ThreadSleep();
+		    SetDelta();
+		    nanosleep(&delta, &delta);
 		} else {
 		    mat[k] = R[j];
 		    pthread_mutex_lock(&var_mutex);
@@ -919,7 +960,9 @@ static void *ItMergeSortAlgo() {
 			Reset();
 			return NULL;
 		    }
-		    ThreadSleep();
+		    //ThreadSleep();
+		    SetDelta();
+		    nanosleep(&delta, &delta);
 		}
 		k++;
 	    } 
@@ -938,7 +981,9 @@ static void *ItMergeSortAlgo() {
 		    Reset();
 		    return NULL;
 		}
-		ThreadSleep();
+		//ThreadSleep();
+		SetDelta();
+		nanosleep(&delta, &delta);
 	    }
 
 	    while(j < n2 && n1 != 0) {
@@ -955,7 +1000,9 @@ static void *ItMergeSortAlgo() {
 		    Reset();
 		    return NULL;
 		}
-		ThreadSleep();
+		//ThreadSleep();
+		SetDelta();
+		nanosleep(&delta, &delta);
 	    }
 	}
     }
@@ -992,14 +1039,18 @@ static int Merge(int l, int m, int r) {
 	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return -1; 
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
 
 	pthread_mutex_lock(&var_mutex);
 	iterator = m + 1 + j;
 	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return -1;
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
     }
 
     i = 0;
@@ -1017,7 +1068,9 @@ static int Merge(int l, int m, int r) {
 	    i++;
 
 	    if(stopSorting) return -1;
-	    ThreadSleep();
+	    //ThreadSleep();
+	    SetDelta();
+	    nanosleep(&delta, &delta);
 	} else {
 	    mat[k] = R[j];
 	    pthread_mutex_lock(&var_mutex);
@@ -1028,7 +1081,9 @@ static int Merge(int l, int m, int r) {
 	    j++;
 
 	    if(stopSorting) return -1;
-	    ThreadSleep();
+	    //ThreadSleep();
+	    SetDelta();
+	    nanosleep(&delta, &delta);
 	}
 	k++;
     } 
@@ -1044,7 +1099,9 @@ static int Merge(int l, int m, int r) {
 	k++;
 
 	if(stopSorting) return -1;
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
     }
 
     while(j < n2 && n1 != 0) {
@@ -1058,7 +1115,9 @@ static int Merge(int l, int m, int r) {
 	k++;
 
 	if(stopSorting) return -1;
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
     }
     return 0;
 }
@@ -1127,7 +1186,9 @@ static int Partition(int low, int high) {
 	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return (-1);
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
 
 	if(mat[j] < pivot) {
 	    i++;
@@ -1142,7 +1203,9 @@ static int Partition(int low, int high) {
 		pthread_mutex_unlock(&var_mutex);
 
 		if(stopSorting) return (-1);
-		ThreadSleep();    
+		//ThreadSleep();    
+		SetDelta();
+		nanosleep(&delta, &delta);
 	    }
 	}
     }
@@ -1152,7 +1215,9 @@ static int Partition(int low, int high) {
     pthread_mutex_unlock(&var_mutex);
 
     if(stopSorting) return (-1);
-    ThreadSleep();
+    //ThreadSleep();
+    SetDelta();
+    nanosleep(&delta, &delta);
 
     return (i+1);
 }
@@ -1184,14 +1249,18 @@ static int Heapify(int N, int i) {
 	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return -1;
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
 
 	pthread_mutex_lock(&var_mutex);
 	Swap(boxes, mat, i, largest); 
 	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return -1;
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
 
 	Heapify(N, largest);
     }
@@ -1224,7 +1293,9 @@ static void *HeapSortAlgo() {
 	    Reset();
 	    return NULL;
 	}
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
 
 	pthread_mutex_lock(&var_mutex);
 	startPoint = i;
@@ -1235,7 +1306,9 @@ static void *HeapSortAlgo() {
 	    Reset();
 	    return NULL;
 	}
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
 
 	res = Heapify(i, 0); 
 	if(res == -1) {
@@ -1278,7 +1351,8 @@ static int CountSort(int exp) {
 	count[(mat[i] / exp) % 10]++;
 
 	if(stopSorting) return -1;
-	ThreadSleep();
+	//ThreadSleep();
+	nanosleep(&delta, &delta);
     }
 
     for(i = 1; i < 10; i++) {
@@ -1307,7 +1381,9 @@ static int CountSort(int exp) {
 	pthread_mutex_unlock(&var_mutex);
 
 	if(stopSorting) return -1;
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
 
 	mat[count[(copy[i]/ exp) % 10]] = copy[i];
 	pthread_mutex_lock(&var_mutex);
@@ -1317,7 +1393,9 @@ static int CountSort(int exp) {
 	count[(copy[i]/ exp) %10]++;
 
 	if(stopSorting) return -1;
-	ThreadSleep();
+	//ThreadSleep();
+	SetDelta();
+	nanosleep(&delta, &delta);
     }
     showIndex = false;
     return 0;
