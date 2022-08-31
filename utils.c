@@ -111,13 +111,6 @@ void Swap(struct Rectangle** boxes, int* mat, int index1, int index2) {
 	mat[index2] = flag;
 }
 
-void Replace(struct Rectangle** boxes, int* mat, int replace, int replacefrom) {
-	if(mat[replace] == mat[replacefrom]) return;
-	boxes[replace]->height = boxes[replacefrom]->height;
-	boxes[replace]->y      = boxes[replacefrom]->y;
-	mat[replace]	       = mat[replacefrom];
-}
-
 int AdjustUnitWidth(int screenWidth, int startX, int shift, int size) {
 	int width = ((screenWidth - 2 * startX) - shift*(size - 1)) / size;
 	return width;

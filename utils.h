@@ -21,24 +21,9 @@ void FreeBoxes(struct Rectangle** boxes, int size);
 //------------------------------------------------------------------------------------------------------|
 void DrawOutLine(int index, Color color, int edge, struct Rectangle** boxes);
 
-//SortRelated Functions and Enum
+//SortRelated Functions
 //------------------------------------------------------------------------------------------------------|
-enum SortType {
-	none = 10,
-	SelectionSort,
-	BubbleSort,
-	InsertionSort,
-	ShakerSort,
-	ItMergeSort,
-	RecMergeSort,
-	QuickSort,
-	HeapSort,
-	RadixSort,
-};
-
 void Swap(struct Rectangle** boxes, int* mat, int index1, int index2);
-
-void Replace(struct Rectangle** boxes, int* mat, int replace, int replacefrom);
 
 //Adjust visual settings 
 //------------------------------------------------------------------------------------------------------|

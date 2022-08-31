@@ -54,10 +54,11 @@ static const int titleFontSize = 25;
 static int size = 40;
 static double sizeScale = 40;
 static int currentSize = 40; 
-static const int maxSize = 250;
+static const int maxSize = 416;
 static const int minSize = 20;
 static int* mat; 
-static int* memoryFreeFlag; static struct Rectangle** boxes;
+static int* memoryFreeFlag; 
+static struct Rectangle** boxes;
 static struct Rectange* copyBoxe;
 static char size_str[10];
 
@@ -65,16 +66,15 @@ static char size_str[10];
 //--------------------------------------------------------------------------------------------------|
 static int Input = 0;
 static int DuringSort = 0; 
-static int SortType = none;
 
 //Time Interval Variables
 //--------------------------------------------------------------------------------------------------|
 static double deltaTime = 0;
 static double stateTime = 0;
-static double timeInterval = 0.500;
+static double timeInterval = 0.400;
 static double timeScale = 0.25;
-static const double maxInterval = 5.000;
-static const double minInterval = 0.015;
+static const double maxInterval = 4.000;
+static const double minInterval = 0.0015;
 
 //Common Sort Variables
 //--------------------------------------------------------------------------------------------------|
@@ -126,13 +126,10 @@ static int frIn = 0;
 
 //Initializing mutex and thread ID
 pthread_mutex_t var_mutex	= PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t condition_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t  condition_cond  = PTHREAD_COND_INITIALIZER;
 pthread_t sort_thread;
 static struct timespec delta; 
 
 //Functions 
-//static void Draw();
 static int Min(int x, int y);
 static void swap(int *a, int *b);
 static void Reset();
@@ -199,53 +196,43 @@ int main(void) {
 		    break;
 		//Begin Selection Sort    
 		case KEY_ONE:
-		    SortType = SelectionSort; 
 		    DrawSelectionSort = true;
 		    pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
 		    break;
 		//Begin Bubble Sort
 		case KEY_TWO:
-		    SortType = BubbleSort;
 		    DrawBubbleSort = true;
 		    pthread_create(&sort_thread, NULL, BubbleSortAlgo, NULL);	
 		    break;
 		//Begin Insertion Sort
 		case KEY_THREE:
-		    SortType = InsertionSort; 
 		    DrawInsertionSort = true;
 		    pthread_create(&sort_thread, NULL, InsertionSortAlgo, NULL);
-		    //currentTarget = 1;
 		    break;
 		//Begin Shaker Sort
 		case KEY_FOUR:
-		    SortType = ShakerSort;
 		    DrawShakerSort = true;
 		    pthread_create(&sort_thread, NULL, ShakerSortAlgo, NULL);
 		    break; //Begin Merge Sort
 		case KEY_FIVE:
-		    SortType = ItMergeSort;
 		    DrawItMergeSort = true;
 		    pthread_create(&sort_thread, NULL, ItMergeSortAlgo, NULL);
 		    break;
 		case KEY_SIX:
-		    SortType = RecMergeSort;
 		    DrawRecMergeSort = true;
 		    pthread_create(&sort_thread, NULL, RecMergeSortAlgo, NULL);
 		    break;
 		//Begin Quick Sort
 		case KEY_SEVEN:
-		    SortType = QuickSort;
 		    DrawQuickSort = true;
 		    pthread_create(&sort_thread, NULL, QuickSortAlgo, NULL);
 		    break;
 		//Begin Heap Sort
 		case KEY_EIGHT:
-		    SortType = HeapSort;
 		    DrawHeapSort = true;
 		    pthread_create(&sort_thread, NULL, HeapSortAlgo, NULL);
 		    break;
 		case KEY_NINE:
-		    SortType = RadixSort;
 		    DrawRadixSort = true;
                     pthread_create(&sort_thread, NULL, RadixSortAlgo, NULL);
 		    break;
@@ -265,21 +252,15 @@ int main(void) {
 	//In case Sort is in Action
 	if(Input != 0) {
 	    DuringSort = GetKeyPressed();
-	    
+
 	    switch(DuringSort) {
-		    //Stop sort
-		    case KEY_Q: 
-			//quit
-			stopSorting = true;
-			break; 
-		    //Close Control Sheet 
-		    case KEY_ENTER: 
-			/*if(showControlSheet) {
-			    showControlSheet = false;
-			} else {
-			    showControlSheet = true;
-			}*/
-			showControlSheet = (showControlSheet)? false : true;
+		//Stop sort
+		case KEY_Q: 
+		    stopSorting = true;
+		    break; 
+		//Close Control Sheet 
+		case KEY_ENTER: 
+		    showControlSheet = (showControlSheet)? false : true;
 	    }
 	}
 
@@ -297,7 +278,7 @@ int main(void) {
 	    } 
 	    pthread_mutex_unlock(&var_mutex);
 	
-	    //Draw size of matrix
+	    //Drawing size of matrix
 	    sprintf(size_str, "%d", size);
 	    DrawText(size_str, 10, 15, 12, FONT_COLOR);
 	
@@ -305,7 +286,7 @@ int main(void) {
 	    //-------------------------------------------------------------------------------------------------------------------|
 	    
 	    //Selection Sort Draw Section 
-	    if(DrawSelectionSort && initDraw) {
+	    if(DrawSelectionSort) {
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(currentTarget, LIGHT_YELLOW_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, DARK_RED, unitGap, boxes);
@@ -315,7 +296,7 @@ int main(void) {
 	    }
 
 	    //Bubble Sort Draw Section
-	    if(DrawBubbleSort && initDraw) {
+	    if(DrawBubbleSort) {
 		pthread_mutex_lock(&var_mutex);
     		if(startPoint != 0) DrawOutLine(size - 1 - startPoint, GREEN_COLOR, unitGap, boxes);
 		DrawOutLine(iterator + 1, LIGHT_WHITE_COLOR, unitGap, boxes);
@@ -325,7 +306,7 @@ int main(void) {
 	    }
 
 	    //InsertionSort 
-	    if(DrawInsertionSort && initDraw) {	
+	    if(DrawInsertionSort) {	
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
 		DrawOutLine(iterator+1, LIGHT_WHITE_COLOR, unitGap, boxes);
@@ -334,7 +315,7 @@ int main(void) {
 	    }
 	    
 	    //ShakerSort
-	    if(DrawShakerSort && initDraw) {
+	    if(DrawShakerSort) {
 		pthread_mutex_lock(&var_mutex);
 		if(startPoint != 0) DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
 		if(endPoint != size - 1) DrawOutLine(endPoint, GREEN_COLOR, unitGap, boxes);
@@ -344,7 +325,7 @@ int main(void) {
 	    }
 
 	    //MergeSort
-	    if((DrawItMergeSort || DrawRecMergeSort) && initDraw) {
+	    if(DrawItMergeSort || DrawRecMergeSort) {
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(mid, GREEN_COLOR, unitGap, boxes);
 	    	DrawOutLine(left_start, LIGHT_YELLOW_COLOR, unitGap, boxes);
@@ -354,7 +335,7 @@ int main(void) {
 	    }
 
 	    //QuickSort
-	    if(DrawQuickSort && initDraw) {
+	    if(DrawQuickSort) {
 		pthread_mutex_lock(&var_mutex);
 		if(currentTarget > -1) DrawOutLine(currentTarget, LIGHT_YELLOW_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
@@ -363,7 +344,7 @@ int main(void) {
 	    }
 
 	    //HeapSort 
-	    if(DrawHeapSort && initDraw) {
+	    if(DrawHeapSort) {
 		pthread_mutex_lock(&var_mutex);
 		int i = 0;
 		int j = 0;
@@ -384,7 +365,7 @@ int main(void) {
 		pthread_mutex_unlock(&var_mutex);
 	    }
 
-	    if(DrawRadixSort && initDraw) {
+	    if(DrawRadixSort) {
 		pthread_mutex_lock(&var_mutex);
 		if(showIndex) {
 		    for(int i = 1; i < 10; i++)
@@ -414,70 +395,66 @@ int main(void) {
 	    timeInterval = maxInterval - timeScale;
 	    
 	    //Matrix Size Control
-	    if(SortType == none) {
-		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
+	    if(!initDraw) {
+		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - sliderGap)/2, 
+							sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
 		if(size  != (int)sizeScale) {
-			changed = true;
-			size = (int)sizeScale;
-			memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
-			free(mat);
-			mat = memoryFreeFlag;
-			FreeBoxes(boxes, currentSize);
-			unitWidth = AdjustUnitWidth(screenWidth, startX, shift, size);
-			boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);	
-			currentSize = size;
+		    changed = true;
+		    size = (int)sizeScale;
+		    memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
+		    free(mat);
+		    mat = memoryFreeFlag;
+		    FreeBoxes(boxes, currentSize);
+		    unitWidth = AdjustUnitWidth(screenWidth, startX, shift, size);
+		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);	
+		    currentSize = size;
 		}
 	    }
 
 	    //Control Sheet Button 
 	    if(GuiButton((Rectangle){sliderMargin + sliderWidth + buttonMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, 
-				    buttonWidth, sliderHeight*2 + sliderGap}, "Show Control Sheet (Press ENTER)")) { 
-		    /*if(!showControlSheet) {
-			showControlSheet = true;
-		    } else {
-			showControlSheet = false;
-		    }*/
-		    changed = true;
-		    showControlSheet = (!showControlSheet)? true : false;
+					buttonWidth, sliderHeight*2 + sliderGap}, "Show Control Sheet (Press ENTER)")) { 
+		changed = true;
+		showControlSheet = (!showControlSheet)? true : false;
 	    }
 	    
 	    //Control Sheet set up
 	    if(showControlSheet) {
-		    //Draw Menu
-		    DrawRectangle(sheetMarginX, sheetMarginY, screenWidth - sheetMarginX*2, screenHeight - sheetMarginY*2, PANEL_COLOR );
-		    DrawRectangle(sheetMarginX + frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX*2 - frameMargin*2, screenHeight - sheetMarginY*2 - frameMargin*2, BACK_COLOR);
-		    //Draw Inner Frame
-		    DrawLine(sheetMarginX + frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, MENU_OUTLINE_COLOR);
-		    DrawLine(sheetMarginX + frameMargin, sheetMarginY + frameMargin, sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR); 
-		    DrawLine(sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
-		    DrawLine(screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
-		    //Draw Outer Frame
-		    DrawLine(sheetMarginX, sheetMarginY, screenWidth - sheetMarginX, sheetMarginY, MENU_OUTLINE_COLOR);
-		    DrawLine(sheetMarginX, sheetMarginY, sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR); 
-		    DrawLine(sheetMarginX, screenHeight - sheetMarginY, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
-		    DrawLine(screenWidth - sheetMarginX, sheetMarginY, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
-		    //Draw Diag Frame 
-		    DrawLine(sheetMarginX, sheetMarginY, sheetMarginX + frameMargin, sheetMarginY + frameMargin, MENU_OUTLINE_COLOR);
-		    DrawLine(screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX, sheetMarginY, MENU_OUTLINE_COLOR); 
-		    DrawLine(sheetMarginX, screenHeight - sheetMarginY, sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
-		    DrawLine(screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
-		    //Draw Text 
-		    //DrawText(text, x, y, fontSize, Color)
-		    DrawText("Control Sheet", sheetMarginX + frameMargin + titleMarginX, sheetMarginY + frameMargin + titleMarginY, titleFontSize, FONT_COLOR);
-		    DrawText("KEY_1 - selection sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY, fontSize, FONT_COLOR);
-		    DrawText("KEY_2 - bubble sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize + textGap, fontSize, FONT_COLOR);
-		    DrawText("KEY_3 - insertion sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*2 + textGap*2, fontSize, FONT_COLOR);
-		    DrawText("KEY_4 - shaker sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*3 + textGap*3, fontSize, FONT_COLOR);
-		    DrawText("KEY_5 - iterative merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*4 + textGap*4, fontSize, FONT_COLOR);
-		    DrawText("KEY_6 - recursive merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*5 + textGap*5, fontSize, FONT_COLOR);
-		    DrawText("KEY_7 - quick sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*6 + textGap*6, fontSize, FONT_COLOR);
-		    DrawText("KEY_8 - heap sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*7 + textGap*7, fontSize, FONT_COLOR);
-		    DrawText("KEY_9 - radix sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*8 + textGap*8, fontSize, FONT_COLOR);
-		    DrawText("KEY_Q - stop current sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*9 + textGap*9, fontSize, FONT_COLOR);
-		    DrawText("KEY_N - generate a new matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*10 + textGap*10, fontSize, FONT_COLOR);
-		    DrawText("KEY_T - generate a triangle matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*11 + textGap*11, fontSize, FONT_COLOR);
-		    DrawText("KEY_ENTER - close control sheet", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*12 + textGap*12, fontSize, FONT_COLOR);
-		    DrawText("KEY_ESC - close application", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*13 + textGap*13, fontSize, FONT_COLOR);
+		//Draw Menu
+		DrawRectangle(sheetMarginX, sheetMarginY, screenWidth - sheetMarginX*2, screenHeight - sheetMarginY*2, PANEL_COLOR );
+		DrawRectangle(sheetMarginX + frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX*2 - frameMargin*2, screenHeight - sheetMarginY*2 - frameMargin*2, BACK_COLOR);
+		//Draw Inner Frame
+		DrawLine(sheetMarginX + frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, MENU_OUTLINE_COLOR);
+		DrawLine(sheetMarginX + frameMargin, sheetMarginY + frameMargin, sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR); 
+		DrawLine(sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
+		DrawLine(screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
+		//Draw Outer Frame
+		DrawLine(sheetMarginX, sheetMarginY, screenWidth - sheetMarginX, sheetMarginY, MENU_OUTLINE_COLOR);
+		DrawLine(sheetMarginX, sheetMarginY, sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR); 
+		DrawLine(sheetMarginX, screenHeight - sheetMarginY, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
+		DrawLine(screenWidth - sheetMarginX, sheetMarginY, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
+		//Draw Diag Frame 
+		DrawLine(sheetMarginX, sheetMarginY, sheetMarginX + frameMargin, sheetMarginY + frameMargin, MENU_OUTLINE_COLOR);
+		DrawLine(screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX, sheetMarginY, MENU_OUTLINE_COLOR); 
+		DrawLine(sheetMarginX, screenHeight - sheetMarginY, sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
+		DrawLine(screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
+		//Draw Text 
+		//DrawText(text, x, y, fontSize, Color)
+		DrawText("Control Sheet", sheetMarginX + frameMargin + titleMarginX, sheetMarginY + frameMargin + titleMarginY, titleFontSize, FONT_COLOR);
+		DrawText("KEY_1 - selection sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY, fontSize, FONT_COLOR);
+		DrawText("KEY_2 - bubble sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize + textGap, fontSize, FONT_COLOR);
+		DrawText("KEY_3 - insertion sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*2 + textGap*2, fontSize, FONT_COLOR);
+		DrawText("KEY_4 - shaker sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*3 + textGap*3, fontSize, FONT_COLOR);
+		DrawText("KEY_5 - iterative merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*4 + textGap*4, fontSize, FONT_COLOR);
+		DrawText("KEY_6 - recursive merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*5 + textGap*5, fontSize, FONT_COLOR);
+		DrawText("KEY_7 - quick sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*6 + textGap*6, fontSize, FONT_COLOR);
+		DrawText("KEY_8 - heap sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*7 + textGap*7, fontSize, FONT_COLOR);
+		DrawText("KEY_9 - radix sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*8 + textGap*8, fontSize, FONT_COLOR);
+		DrawText("KEY_Q - stop current sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*9 + textGap*9, fontSize, FONT_COLOR);
+		DrawText("KEY_N - generate a new matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*10 + textGap*10, fontSize, FONT_COLOR);
+		DrawText("KEY_T - generate a triangle matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*11 + textGap*11, fontSize, FONT_COLOR);
+		DrawText("KEY_ENTER - close control sheet", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*12 + textGap*12, fontSize, FONT_COLOR);
+		DrawText("KEY_ESC - close application", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*13 + textGap*13, fontSize, FONT_COLOR);
 	    }
 	 
 	EndDrawing();
@@ -494,7 +471,6 @@ int main(void) {
 
 static void Reset() {
     Input = 0;
-    SortType = none; 
     startPoint = 0; 
     currentTarget = 0;
     iterator = 0;
@@ -513,18 +489,6 @@ static void Reset() {
     left_start = 0;
     right_end = 0; heap_child = 0;
     heap_parent = 0;
-}
-
-static void ThreadSleep() {
-    pthread_mutex_lock(&condition_mutex);
-    pthread_cond_wait(&condition_cond, &condition_mutex);
-    pthread_mutex_unlock(&condition_mutex);
-}
-
-static void ThreadWake() {
-    pthread_mutex_lock(&condition_mutex);
-    pthread_cond_signal(&condition_cond); 
-    pthread_mutex_unlock(&condition_mutex);
 }
 
 static void SetDelta() {
