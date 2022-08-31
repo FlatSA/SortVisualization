@@ -51,11 +51,11 @@ static const int titleFontSize = 25;
 
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
-static int size = 20;
-static double sizeScale = 20;
-static int currentSize = 20; 
+static int size = 40;
+static double sizeScale = 40;
+static int currentSize = 40; 
 static const int maxSize = 250;
-static const int minSize = 12;
+static const int minSize = 20;
 static int* mat; 
 static int* memoryFreeFlag; static struct Rectangle** boxes;
 static struct Rectange* copyBoxe;
@@ -64,15 +64,16 @@ static char size_str[10];
 //Input Variables
 //--------------------------------------------------------------------------------------------------|
 static int Input = 0;
-static int DuringSort = 0; static int SortType = none;
+static int DuringSort = 0; 
+static int SortType = none;
 
 //Time Interval Variables
 //--------------------------------------------------------------------------------------------------|
-static double currentTime = 0;
-static double deltaTime = 0.f;
+static double deltaTime = 0;
+static double stateTime = 0;
 static double timeInterval = 0.500;
 static double timeScale = 0.25;
-static const double maxInterval = 1.000;
+static const double maxInterval = 5.000;
 static const double minInterval = 0.015;
 
 //Common Sort Variables
@@ -200,44 +201,53 @@ int main(void) {
 		case KEY_ONE:
 		    SortType = SelectionSort; 
 		    DrawSelectionSort = true;
+		    pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
 		    break;
 		//Begin Bubble Sort
 		case KEY_TWO:
 		    SortType = BubbleSort;
 		    DrawBubbleSort = true;
+		    pthread_create(&sort_thread, NULL, BubbleSortAlgo, NULL);	
 		    break;
 		//Begin Insertion Sort
 		case KEY_THREE:
 		    SortType = InsertionSort; 
 		    DrawInsertionSort = true;
+		    pthread_create(&sort_thread, NULL, InsertionSortAlgo, NULL);
 		    //currentTarget = 1;
 		    break;
 		//Begin Shaker Sort
 		case KEY_FOUR:
 		    SortType = ShakerSort;
 		    DrawShakerSort = true;
+		    pthread_create(&sort_thread, NULL, ShakerSortAlgo, NULL);
 		    break; //Begin Merge Sort
 		case KEY_FIVE:
 		    SortType = ItMergeSort;
 		    DrawItMergeSort = true;
+		    pthread_create(&sort_thread, NULL, ItMergeSortAlgo, NULL);
 		    break;
 		case KEY_SIX:
 		    SortType = RecMergeSort;
 		    DrawRecMergeSort = true;
+		    pthread_create(&sort_thread, NULL, RecMergeSortAlgo, NULL);
 		    break;
 		//Begin Quick Sort
 		case KEY_SEVEN:
 		    SortType = QuickSort;
 		    DrawQuickSort = true;
+		    pthread_create(&sort_thread, NULL, QuickSortAlgo, NULL);
 		    break;
 		//Begin Heap Sort
 		case KEY_EIGHT:
 		    SortType = HeapSort;
 		    DrawHeapSort = true;
+		    pthread_create(&sort_thread, NULL, HeapSortAlgo, NULL);
 		    break;
 		case KEY_NINE:
 		    SortType = RadixSort;
 		    DrawRadixSort = true;
+                    pthread_create(&sort_thread, NULL, RadixSortAlgo, NULL);
 		    break;
 		//Close Control Sheet
 		case KEY_ENTER: 
@@ -271,87 +281,6 @@ int main(void) {
 			}*/
 			showControlSheet = (showControlSheet)? false : true;
 	    }
-	}
-
-	//Ensure Time Interval and Make One Sort-Step per timeInterval
-	//----------------------------------------------------------------------------------------------|	
-	if(currentTime < 0.01f) currentTime = GetTime();
-	deltaTime = GetTime() - currentTime;
-	
-	if((deltaTime > timeInterval) && Input) {
-		currentTime = GetTime();
-		
-		if(SortType == SelectionSort) {
-			if(initSort) { 
-				pthread_create(&sort_thread, NULL, SelectionSortAlgo, NULL);
-				initSort = false;
-			}	    
-			//ThreadWake();	
-		}
-
-		if(SortType == BubbleSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, BubbleSortAlgo, NULL);
-				initSort = false;
-			}
-			//ThreadWake();
-		}
-
-		if(SortType == InsertionSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, InsertionSortAlgo, NULL);
-				initSort = false;
-			}
-			//ThreadWake();	
-		}
-
-		if(SortType == ShakerSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, ShakerSortAlgo, NULL);
-				initSort = false;
-			} 
-			//ThreadWake();
-		}	
-
-		if(SortType == ItMergeSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, ItMergeSortAlgo, NULL);
-				initSort = false;
-			}
-			//ThreadWake();
-		}
-
-		if(SortType == RecMergeSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, RecMergeSortAlgo, NULL); 
-				initSort = false;
-			}
-			//ThreadWake();
-		}
-
-		if(SortType == QuickSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, QuickSortAlgo, NULL);
-				initSort = false;
-			}
-			//ThreadWake();
-		}
-
-		if(SortType == HeapSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, HeapSortAlgo, NULL);
-				initSort = false;
-			}
-	    		//ThreadWake();
-		}
-
-		if(SortType == RadixSort) {
-			if(initSort) {
-				pthread_create(&sort_thread, NULL, RadixSortAlgo, NULL);
-				initSort = false;
-			}
-			//ThreadWake();
-		}
 	}
 
 	//Draw Section
@@ -468,7 +397,11 @@ int main(void) {
 		pthread_mutex_unlock(&var_mutex);
 	    }
 
-	    if(!initDraw && (deltaTime > timeInterval)) changed = false;
+            deltaTime = GetTime() - stateTime;
+	    if(!initDraw && (deltaTime > timeInterval)) { 
+		changed = false;
+		stateTime = GetTime();	
+	    }
 	}
 
 	    //GUI controls section
