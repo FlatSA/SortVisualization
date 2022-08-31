@@ -2,15 +2,16 @@
 
 ![](images/readme2.png)
 
-#Implemented Sorts:
-    -Selection Sort
-    -Bubble Sort
-    -Insertion Sort
-    -Shaker Sort
-    -Iterative Merge Sort
-    -Recursive Merge Sort
-    -Quick Sort
-    -Heap Sort
-    -Radix Sort
+# Implemented Sorts:  
+    -Selection Sort  
+    -Bubble Sort  
+    -Insertion Sort  
+    -Shaker Sort  
+    -Iterative Merge Sort  
+    -Recursive Merge Sort  
+    -Quick Sort  
+    -Heap Sort  
+    -Radix Sort  
+
     
 
