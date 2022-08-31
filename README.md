@@ -1,6 +1,16 @@
 # Sort Visualization. Runnig with Raylib (https://www.raylib.com)
 
-Insertion, Selection, Bubble, Shaker, Merge, Quick, Heap, Radix sorts are available for now
+![](images/readme2.png)
 
-![](images/SortVisual.png)
+#Implemented Sorts:
+    -Selection Sort
+    -Bubble Sort
+    -Insertion Sort
+    -Shaker Sort
+    -Iterative Merge Sort
+    -Recursive Merge Sort
+    -Quick Sort
+    -Heap Sort
+    -Radix Sort
+    
 
