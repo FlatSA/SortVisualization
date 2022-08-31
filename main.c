@@ -6,7 +6,7 @@
 //Required for GuiControls
 #define RAYGUI_IMPLEMENTATION 
 #include "raygui.h" 
-//raygui embedded style //Colors for styles/dark.h 
+//raygui embedded style && Colors for styles/dark.h 
 #include "styles/StyleColors.h"
 #include "styles/dark.h"
 
@@ -494,6 +494,7 @@ static void Reset() {
     DrawRecMergeSort = false;
     DrawQuickSort = false;
     DrawHeapSort = false;
+    DrawRadixSort = false;
     initSort = true;
     initDraw = false;
     stopSorting = false;
