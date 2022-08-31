@@ -21,7 +21,7 @@ static const int min = 5;
 static int unitWidth = 50; 
 static const int shift = 1;
 static const int heightPar = 1; 
-static const int startX = 50;
+static const int startX = 45;
 static const int startY = screenHeight - 110;
 static const int unitGap = 0;
 static int triangleGap = 12;
@@ -54,7 +54,7 @@ static const int titleFontSize = 25;
 static int size = 40;
 static double sizeScale = 40;
 static int currentSize = 40; 
-static const int maxSize = 416;
+static const int maxSize = 420;
 static const int minSize = 20;
 static int* mat; 
 static int* memoryFreeFlag; 
@@ -71,9 +71,9 @@ static int DuringSort = 0;
 //--------------------------------------------------------------------------------------------------|
 static double deltaTime = 0;
 static double stateTime = 0;
-static double timeInterval = 0.400;
-static double timeScale = 0.25;
-static const double maxInterval = 4.000;
+static double timeInterval = 0.900;
+static double timeScale = 4.000 - 0.900;
+static double maxInterval = 4.000;
 static const double minInterval = 0.0015;
 
 //Common Sort Variables
@@ -264,10 +264,11 @@ int main(void) {
 	    }
 	}
 
+	
 	//Draw Section
 	//----------------------------------------------------------------------------------------------|
     	BeginDrawing();
-	if(changed) {  
+	if(changed) {   
 
 	    //Drawing Matrix in a Current state	
 	    ClearBackground(BACK_COLOR);
@@ -401,6 +402,17 @@ int main(void) {
 		if(size  != (int)sizeScale) {
 		    changed = true;
 		    size = (int)sizeScale;
+		    if(size > 200) { 
+			double per = timeScale/(maxInterval - minInterval); 
+			maxInterval = 0.100; 
+			timeScale = per*(maxInterval - minInterval); 
+			timeInterval = maxInterval - timeScale; 
+		    } else { 
+			double per = timeScale/(maxInterval - minInterval); 
+			maxInterval = 4.000; 
+			timeScale = per*(maxInterval - minInterval); 
+			timeInterval = maxInterval - timeScale; 
+		    }
 		    memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
 		    free(mat);
 		    mat = memoryFreeFlag;
