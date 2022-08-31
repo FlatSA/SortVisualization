@@ -102,8 +102,7 @@ static bool DrawShakerSort = false;
 static int  endPoint = 0;
 
 //Merge Sort Variables
-static bool DrawRecMergeSort = false;
-static bool DrawItMergeSort = false; 
+static bool DrawRecMergeSort = false; static bool DrawItMergeSort = false; 
 static int mid = 0;
 static int left_start = 0;
 static int right_end = 0;
@@ -125,7 +124,7 @@ static int frIn = 0;
 
 
 //Initializing mutex and thread ID
-pthread_mutex_t var_mutex	= PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t var_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_t sort_thread;
 static struct timespec delta; 
 
@@ -290,7 +289,7 @@ int main(void) {
 	    if(DrawSelectionSort) {
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(currentTarget, LIGHT_YELLOW_COLOR, unitGap, boxes);
-		DrawOutLine(startPoint, DARK_RED, unitGap, boxes);
+		DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
 	    	if(timeInterval < 0.06) DrawOutLine(iterator - 1, LIGHT_WHITE_COLOR, unitGap, boxes);
 		if(iterator < size) DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
@@ -328,9 +327,9 @@ int main(void) {
 	    //MergeSort
 	    if(DrawItMergeSort || DrawRecMergeSort) {
 		pthread_mutex_lock(&var_mutex);
-		DrawOutLine(mid, GREEN_COLOR, unitGap, boxes);
-	    	DrawOutLine(left_start, LIGHT_YELLOW_COLOR, unitGap, boxes);
-		DrawOutLine(right_end, GREEN_COLOR, unitGap, boxes);
+		DrawOutLine(mid, BLUE_COLOR, unitGap, boxes);
+	    	DrawOutLine(left_start, DARK_BLUE_COLOR, unitGap, boxes);
+		DrawOutLine(right_end, DARK_BLUE_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
@@ -338,8 +337,8 @@ int main(void) {
 	    //QuickSort
 	    if(DrawQuickSort) {
 		pthread_mutex_lock(&var_mutex);
-		if(currentTarget > -1) DrawOutLine(currentTarget, LIGHT_YELLOW_COLOR, unitGap, boxes);
-		DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
+		if(currentTarget > -1) DrawOutLine(currentTarget, BLUE_COLOR, unitGap, boxes);
+		DrawOutLine(startPoint, DARK_BLUE_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
@@ -355,14 +354,14 @@ int main(void) {
 		    end = i * 2;
 		    if(j%2 == 0) { for( ;i <= end; i++) {
 			    if(i >= startPoint) break;
-			    DrawOutLine(i, LIGHT_WHITE_COLOR, unitGap, boxes);
+			    DrawOutLine(i, LIGHT_PINK_COLOR, unitGap, boxes);
 			} 
 		    }
 		    j++;
 		}
 		if(startPoint < size) DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
-		DrawOutLine(heap_parent, GREEN_COLOR, unitGap, boxes);
-		DrawOutLine(heap_child, GREEN_COLOR, unitGap, boxes);
+		DrawOutLine(heap_parent, LIGHT_WHITE_COLOR, unitGap, boxes);
+		DrawOutLine(heap_child, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
 
@@ -371,8 +370,8 @@ int main(void) {
 		if(showIndex) {
 		    for(int i = 1; i < 10; i++)
 			if(countInd[i] < size) DrawOutLine(countInd[i], LIGHT_YELLOW_COLOR, unitGap, boxes);
-		    DrawOutLine(chIn, GREEN_COLOR, unitGap, boxes);
-		    DrawOutLine(frIn, GREEN_COLOR, unitGap, boxes);
+		    DrawOutLine(chIn, LIGHT_WHITE_COLOR, unitGap, boxes);
+		    DrawOutLine(frIn, LIGHT_WHITE_COLOR, unitGap, boxes);
 		} else {
 		    DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		}
@@ -394,6 +393,7 @@ int main(void) {
 	    DrawRectangle(panelStartX, panelStartY, panelWidth, panelHeight, PANEL_COLOR); 
 	    timeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "delay", NULL, timeScale, minInterval, maxInterval);
 	    timeInterval = maxInterval - timeScale;
+	    DrawRectangle(sliderMargin + sliderWidth - 10, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2 - 2, 2, sliderHeight + 4, UNIT_COLOR);
 	    
 	    //Matrix Size Control
 	    if(!initDraw) {
@@ -499,8 +499,10 @@ static void Reset() {
     stopSorting = false;
     mid = 0;
     left_start = 0;
-    right_end = 0; heap_child = 0;
+    right_end = 0; 
+    heap_child = 0;
     heap_parent = 0;
+    showIndex = false;
 }
 
 static void SetDelta() {
@@ -1261,6 +1263,7 @@ static int CountSort(int exp) {
 
 	if(stopSorting) return -1;
 	//ThreadSleep();
+	SetDelta();
 	nanosleep(&delta, &delta);
     }
 
