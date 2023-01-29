@@ -3,6 +3,7 @@
 #include<stddef.h> 
 #include<pthread.h>
 #include<time.h>
+
 //Required for GuiControls
 #define RAYGUI_IMPLEMENTATION 
 #include "raygui.h" 
@@ -45,7 +46,6 @@ static const int titleMarginY = 40;
 static const int titleFontSize = 25;
 static const int maxSize = 420;
 static const int minSize = 20;
-static bool	 changed = true;
 static int	 triangleGap = 12;
 static int	 unitWidth = 50; 
 static double	 showControlSheet = false;
@@ -196,7 +196,6 @@ int main(void) {
 		    FreeSpace(mat, boxes, size);
 		    mat = GenerateMat(size, max, min);
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
-		    changed = true;
 		    Input = 0;
 		    break;
 		//Generate Triangle Matrix
@@ -205,7 +204,6 @@ int main(void) {
 		    triangleGap = AdjustTriangleGap(size, min, max);
 		    mat = GenerateTriangleMat(size, triangleGap); 
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
-		    changed = true;
 		    Input = 0;
 		    break;
 		//Begin Selection Sort    
@@ -253,7 +251,6 @@ int main(void) {
 		//Close Control Sheet
 		case KEY_ENTER: 
 		    if(showControlSheet) {
-			changed = true;
 			showControlSheet = false;
 		    } else {
 			showControlSheet = true;
@@ -282,7 +279,6 @@ int main(void) {
 	//Draw Section
 	//----------------------------------------------------------------------------------------------|
     	BeginDrawing();
-	if(true) {   
 
 	    //Drawing Matrix in a Current state	
 	    ClearBackground(BACK_COLOR);
@@ -292,11 +288,11 @@ int main(void) {
 		DrawRectangleRec(*boxes[i], UNIT_COLOR);
 	    } 
 	    pthread_mutex_unlock(&var_mutex);
-	
+
 	    //Drawing size of matrix
 	    sprintf(size_str, "%d", size);
 	    DrawText(size_str, 10, 15, 12, FONT_COLOR);
-	
+
 	    //Sort Iteration Section 
 	    //-------------------------------------------------------------------------------------------------------------------|
 	    
@@ -305,32 +301,29 @@ int main(void) {
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(currentTarget, LIGHT_YELLOW_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
-	    	if(timeInterval < 0.06) DrawOutLine(iterator - 1, LIGHT_WHITE_COLOR, unitGap, boxes);
+		if(timeInterval < 0.06) DrawOutLine(iterator - 1, LIGHT_WHITE_COLOR, unitGap, boxes);
 		if(iterator < size) DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
-
 	    //Bubble Sort Draw Section
-	    if(DrawBubbleSort) {
+	    else if(DrawBubbleSort) {
 		pthread_mutex_lock(&var_mutex);
-    		if(startPoint != 0) DrawOutLine(size - 1 - startPoint, GREEN_COLOR, unitGap, boxes);
+		if(startPoint != 0) DrawOutLine(size - 1 - startPoint, GREEN_COLOR, unitGap, boxes);
 		DrawOutLine(iterator + 1, LIGHT_WHITE_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 
 	    }
-
 	    //InsertionSort 
-	    if(DrawInsertionSort) {	
+	    else if(DrawInsertionSort) {	
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
 		DrawOutLine(iterator+1, LIGHT_WHITE_COLOR, unitGap, boxes);
 		if(iterator != -1) DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
-	    
 	    //ShakerSort
-	    if(DrawShakerSort) {
+	    else if(DrawShakerSort) {
 		pthread_mutex_lock(&var_mutex);
 		if(startPoint != 0) DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
 		if(endPoint != size - 1) DrawOutLine(endPoint, GREEN_COLOR, unitGap, boxes);
@@ -338,28 +331,25 @@ int main(void) {
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
-
 	    //MergeSort
-	    if(DrawItMergeSort || DrawRecMergeSort) {
+	    else if(DrawItMergeSort || DrawRecMergeSort) {
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(mid, BLUE_COLOR, unitGap, boxes);
-	    	DrawOutLine(left_start, DARK_BLUE_COLOR, unitGap, boxes);
+		DrawOutLine(left_start, DARK_BLUE_COLOR, unitGap, boxes);
 		DrawOutLine(right_end, DARK_BLUE_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
-
 	    //QuickSort
-	    if(DrawQuickSort) {
+	    else if(DrawQuickSort) {
 		pthread_mutex_lock(&var_mutex);
 		if(currentTarget > -1) DrawOutLine(currentTarget, BLUE_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, DARK_BLUE_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
-
 	    //HeapSort 
-	    if(DrawHeapSort) {
+	    else if(DrawHeapSort) {
 		pthread_mutex_lock(&var_mutex);
 		int i = 0;
 		int j = 0;
@@ -380,8 +370,8 @@ int main(void) {
 		DrawOutLine(heap_child, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
-
-	    if(DrawRadixSort) {
+	    //Radix Sort
+	    else if(DrawRadixSort) {
 		pthread_mutex_lock(&var_mutex);
 		if(showIndex) {
 		    for(int i = 1; i < 10; i++)
@@ -394,13 +384,7 @@ int main(void) {
 		pthread_mutex_unlock(&var_mutex);
 	    }
 
-            deltaTime = GetTime() - stateTime;
-	    if(!initDraw && (deltaTime > timeInterval)) { 
-		changed = false;
-		stateTime = GetTime();	
-	    }
-	}
-
+		  
 	    //GUI controls section
 	    //------------------------------------------------------------------------------------------------------------------|
 
@@ -416,7 +400,6 @@ int main(void) {
 		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - sliderGap)/2, 
 							sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
 		if(size  != (int)sizeScale) {
-		    changed = true;
 		    size = (int)sizeScale;
 		    if(size > 200) { 
 			double per = timeScale/(maxInterval - minInterval); 
@@ -442,7 +425,6 @@ int main(void) {
 	    //Control Sheet Button 
 	    if(GuiButton((Rectangle){sliderMargin + sliderWidth + buttonMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, 
 					buttonWidth, sliderHeight*2 + sliderGap}, "Show Control Sheet (Press ENTER)")) { 
-		changed = true;
 		showControlSheet = (!showControlSheet)? true : false;
 	    }
 	    
@@ -519,7 +501,6 @@ static void SetDelta() {
 }
 
 static void *SelectionSortAlgo() {
-    changed = true;
     initDraw = true;
     
     int st;
@@ -579,7 +560,6 @@ static void *SelectionSortAlgo() {
 }
 
 static void *BubbleSortAlgo() {
-    changed = true;
     initDraw = true;
     int st;
     int i;
@@ -621,7 +601,6 @@ static void *BubbleSortAlgo() {
 }
 
 static void *InsertionSortAlgo() {
-    changed = true;
     int height;
     int y;
     int key;
@@ -682,7 +661,6 @@ static void *InsertionSortAlgo() {
 }
 
 static void *ShakerSortAlgo() {
-    changed = true;
 
     bool swapped = true;
     int strP = 0;
@@ -784,7 +762,6 @@ static int Min(int x, int y) {
 }
 
 static void *ItMergeSortAlgo() {
-    changed = true;
     int curr_size;
     int ls;
     int re;
@@ -1042,7 +1019,6 @@ static int Merge(int l, int m, int r) {
 
 
 static int MergeSortRec(int l, int r) {
-    changed = true;
     if(l < r) {
 	int md = l + (r - l)/2;
 	int res;
@@ -1084,7 +1060,6 @@ static int QuickSortRec(int low, int high) {
 }
 
 static int Partition(int low, int high) {
-    changed = true;
     int pivot = mat[high];
     int i = (low - 1);
 
@@ -1146,7 +1121,6 @@ static void swap(int* a, int* b) {
 }
 
 static int Heapify(int N, int i) {
-    changed = true;
     initDraw = true;
     
     int largest = i;
@@ -1322,7 +1296,6 @@ static int CountSort(int exp) {
 
 static void * RadixSortAlgo() {
     initDraw = true;
-    changed = true;
     int m = getMax(size);
     int res = 0;
 
