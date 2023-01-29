@@ -12,7 +12,45 @@
 
 #include"utils.h"
 
-static char *controls[] = {"Control Sheet", 
+//Screen Related Variables
+//--------------------------------------------------------------------------------------------------|
+static const int screenWidth = 1350;
+static const int screenHeight = 680;
+static const int max = 550;
+static const int min = 5;
+static const int shift = 1;
+static const int heightPar = 1; 
+static const int startX = 45;
+static const int startY = 570;
+static const int unitGap = 0;
+static const int panelStartX = 0;
+static const int panelStartY = 600; 
+static const int panelWidth = 1350; 
+static const int panelHeight = 80; 
+static const int sliderMargin = 65; 
+static const int sliderHeight = 22;
+static const int sliderWidth = 602;
+static const int sliderGap = 4; 
+static const int buttonWidth = 615;
+static const int buttonMargin = 20;
+static const int sheetMarginX = 435; 
+static const int sheetMarginY = 75; 
+static const int frameMargin = 20;
+static const int textMarginX = 40;
+static const int textMarginY = 100;
+static const int fontSize = 20;
+static const int textGap = 6;
+static const int titleMarginX = 125;
+static const int titleMarginY = 40;
+static const int titleFontSize = 25;
+static const int maxSize = 420;
+static const int minSize = 20;
+static bool	 changed = true;
+static int	 triangleGap = 12;
+static int	 unitWidth = 50; 
+static double	 showControlSheet = false;
+static const char *controls[] = {
+	"Control Sheet", 
 	"KEY_1 - selection sort",
 	"KEY_2 - bubble sort", 
 	"KEY_3 - insertion sort", 
@@ -29,146 +67,105 @@ static char *controls[] = {"Control Sheet",
 	"KEY_ESC - close application",
 };
 
-//Screen Related Variables
-//--------------------------------------------------------------------------------------------------|
-static const int screenWidth = 1350;
-static const int screenHeight = 680;
-static const int max = 550;
-static const int min = 5;
-static int unitWidth = 50; 
-static const int shift = 1;
-static const int heightPar = 1; 
-static const int startX = 45;
-static const int startY = screenHeight - 110;
-static const int unitGap = 0;
-static int triangleGap = 12;
-static int changed = true;
-//Gui control panel 
-static const int panelStartX = 0;
-static const int panelStartY = screenHeight - 80; 
-static const int panelWidth = screenWidth; 
-static const int panelHeight = 80; 
-static const int sliderMargin = 65; 
-static const int sliderHeight = 22;
-static const int sliderWidth = (screenWidth - sliderMargin)/2 - 40;
-static const int sliderGap = 4; 
-static const int buttonWidth = 615;
-static const int buttonMargin = 20;
-static const int sheetMarginX = 435; 
-static const int sheetMarginY = 75; //150
-static double showControlSheet = false;
-static const int frameMargin = 20;
-static const int textMarginX = 40;
-static const int textMarginY = 100;
-static const int fontSize = 20;
-static const int textGap = 6;
-static const int titleMarginX = 125;
-static const int titleMarginY = 40;
-static const int titleFontSize = 25;
-
 //Initializing Main Matrix
 //--------------------------------------------------------------------------------------------------|
-static int size = 40;
-static double sizeScale = 40;
-static int currentSize = 40; 
-static const int maxSize = 420;
-static const int minSize = 20;
-static int* mat; 
-static int* memoryFreeFlag; 
+static int	size = 40;
+static double	sizeScale = 40;
+static int	currentSize = 40; 
+static int      *mat; 
+static int      *memoryFreeFlag; 
+static char	size_str[10];
+
 static struct Rectangle** boxes;
-static struct Rectange* copyBoxe;
-static char size_str[10];
 
 //Input Variables
 //--------------------------------------------------------------------------------------------------|
-static int Input = 0;
-static int DuringSort = 0; 
+static int	Input = 0;
+static int	DuringSort = 0; 
 
 //Time Interval Variables
 //--------------------------------------------------------------------------------------------------|
-static double deltaTime = 0;
-static double stateTime = 0;
-static double timeInterval = 0.900;
-static double timeScale = 4.000 - 0.900;
-static double maxInterval = 4.000;
-static const double minInterval = 0.0015;
+static double	maxInterval = 4.000;
+static double	minInterval = 0.0015;
+static double	deltaTime = 0;
+static double	stateTime = 0;
+static double	timeInterval = 0.900;
+static double	timeScale = 4.000 - 0.900;
 
-//Common Sort Variables
+//Common Sorting Variables
 //--------------------------------------------------------------------------------------------------|
-static int iterator = 0;
-static int startPoint = 0;
-static int currentTarget = 0;
-static bool initSort = true;
-static bool initDraw = false;
-static bool stopSorting = false;
+static int	iterator = 0;
+static int	startPoint = 0;
+static int	currentTarget = 0;
+static bool	initDraw = false;
+static bool	stopSorting = false;
 
 //Selection Sort Variables
 //--------------------------------------------------------------------------------------------------|
-static bool DrawSelectionSort = false;
+static bool	DrawSelectionSort = false;
 
 //Bubble Sort Variables
 //--------------------------------------------------------------------------------------------------|
-static bool DrawBubbleSort = false;
+static bool	DrawBubbleSort = false;
     
 //Insertion Sort Variables
 //--------------------------------------------------------------------------------------------------|
-static bool DrawInsertionSort = false;
+static bool	DrawInsertionSort = false;
 
 //Shaker Sort Variables
-static bool DrawShakerSort = false;
-static int  endPoint = 0;
+static bool	DrawShakerSort = false;
+static int	endPoint = 0;
 
 //Merge Sort Variables
-static bool DrawRecMergeSort = false; 
-static bool DrawItMergeSort = false; 
-static int mid = 0;
-static int left_start = 0;
-static int right_end = 0;
+static bool	DrawRecMergeSort = false; 
+static bool	DrawItMergeSort = false; 
+static int	mid = 0;
+static int	left_start = 0;
+static int	right_end = 0;
 
 //Quick Sort Variables
-static bool DrawQuickSort = false;
+static bool	DrawQuickSort = false;
 
 //Heap Sort Variables
-static bool DrawHeapSort = false;
-static int heap_parent = 0;
-static int heap_child = 0;
+static bool	DrawHeapSort = false;
+static int	heap_parent = 0;
+static int	heap_child = 0;
 
 //Radix Sort Variables 
-static bool DrawRadixSort = false;
-static int countInd[10] = {0};
-static bool showIndex = false;
-static int chIn = 0;
-static int frIn = 0;
-
+static bool	DrawRadixSort = false;
+static int	countInd[10] = {0};
+static bool	showIndex = false;
+static int	chIn = 0;
+static int	frIn = 0;
 
 //Initializing mutex and thread ID
-pthread_mutex_t var_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_t sort_thread;
+static pthread_mutex_t var_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_t       sort_thread;
 static struct timespec delta; 
 
 //Functions 
-static int Min(int x, int y);
-static void swap(int *a, int *b);
-static void Reset();
-static void ThreadSleep();
-static void ThreadWake();
-static void *SelectionSortAlgo();
-static void *BubbleSortAlgo();
-static void *InsertionSortAlgo();
-static void *ShakerSortAlgo();
-static void *ItMergeSortAlgo();
-static void *RecMergeSortAlgo();
-static int MergeSortRec(int l, int r);
-static int Merge(int l, int m, int r);
-static void *QuickSortAlgo();
-static int QuickSortRec(int low, int high);
-static int Partition(int low, int high);
-static void *HeapSortAlgo();
-static int Heapify(int N, int i);
-static int Pow(int i, int j);
-static void *RadixSortAlgo();
-static int CountSort(int exp);
-static int getMax();
+static int	Min(int x, int y);
+static void	swap(int *a, int *b);
+static void	Reset();
+static void	ThreadSleep();
+static void	ThreadWake();
+static void	*SelectionSortAlgo();
+static void	*BubbleSortAlgo();
+static void	*InsertionSortAlgo();
+static void	*ShakerSortAlgo();
+static void	*ItMergeSortAlgo();
+static void	*RecMergeSortAlgo();
+static int	MergeSortRec(int l, int r);
+static int	Merge(int l, int m, int r);
+static void	*QuickSortAlgo();
+static int	QuickSortRec(int low, int high);
+static int	Partition(int low, int high);
+static void	*HeapSortAlgo();
+static int	Heapify(int N, int i);
+static int	Pow(int i, int j);
+static void	*RadixSortAlgo();
+static int	CountSort(int exp);
+static int	getMax();
 
 int main(void) {
 
@@ -285,7 +282,7 @@ int main(void) {
 	//Draw Section
 	//----------------------------------------------------------------------------------------------|
     	BeginDrawing();
-	if(changed) {   
+	if(true) {   
 
 	    //Drawing Matrix in a Current state	
 	    ClearBackground(BACK_COLOR);
@@ -370,7 +367,8 @@ int main(void) {
 		while(i < startPoint) {
 		    i = Pow(2, j)-1;
 		    end = i * 2;
-		    if(j%2 == 0) { for( ;i <= end; i++) {
+		    if(j%2 == 0) { 
+			for(; i <= end; i++) {
 			    if(i >= startPoint) break;
 			    DrawOutLine(i, LIGHT_PINK_COLOR, unitGap, boxes);
 			} 
@@ -503,7 +501,6 @@ static void Reset() {
     DrawQuickSort = false;
     DrawHeapSort = false;
     DrawRadixSort = false;
-    initSort = true;
     initDraw = false;
     stopSorting = false;
     mid = 0;
