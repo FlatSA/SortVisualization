@@ -1,5 +1,7 @@
 # Sort Visualization. Runnig with Raylib (https://www.raylib.com)
 
+# WARNING: PHOTOSENSITIVITY/EPILEPSY SEIZURES
+
 ![](images/readme2.png)
 
 # Implemented Sorts:  
