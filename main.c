@@ -12,6 +12,23 @@
 
 #include"utils.h"
 
+static char *controls[] = {"Control Sheet", 
+	"KEY_1 - selection sort",
+	"KEY_2 - bubble sort", 
+	"KEY_3 - insertion sort", 
+	"KEY_4 - shaker sort",
+	"KEY_5 - iterative merge sort",
+	"KEY_6 - recursive merge sort",
+	"KEY_7 - quick sort",
+	"KEY_8 - heap sort",
+	"KEY_9 - radix sort",
+	"KEY_Q - stop current sort",
+	"KEY_N - generate new matrix",
+	"KEY_T - generate triangle matrix",
+	"KEY_ENTER - close control sheet",
+	"KEY_ESC - close application",
+};
+
 //Screen Related Variables
 //--------------------------------------------------------------------------------------------------|
 static const int screenWidth = 1350;
@@ -102,7 +119,8 @@ static bool DrawShakerSort = false;
 static int  endPoint = 0;
 
 //Merge Sort Variables
-static bool DrawRecMergeSort = false; static bool DrawItMergeSort = false; 
+static bool DrawRecMergeSort = false; 
+static bool DrawItMergeSort = false; 
 static int mid = 0;
 static int left_start = 0;
 static int right_end = 0;
@@ -450,23 +468,13 @@ int main(void) {
 		DrawLine(screenWidth - sheetMarginX - frameMargin, sheetMarginY + frameMargin, screenWidth - sheetMarginX, sheetMarginY, MENU_OUTLINE_COLOR); 
 		DrawLine(sheetMarginX, screenHeight - sheetMarginY, sheetMarginX + frameMargin, screenHeight - sheetMarginY - frameMargin, MENU_OUTLINE_COLOR);
 		DrawLine(screenWidth - sheetMarginX - frameMargin, screenHeight - sheetMarginY - frameMargin, screenWidth - sheetMarginX, screenHeight - sheetMarginY, MENU_OUTLINE_COLOR);
+
 		//Draw Text 
 		//DrawText(text, x, y, fontSize, Color)
 		DrawText("Control Sheet", sheetMarginX + frameMargin + titleMarginX, sheetMarginY + frameMargin + titleMarginY, titleFontSize, FONT_COLOR);
-		DrawText("KEY_1 - selection sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY, fontSize, FONT_COLOR);
-		DrawText("KEY_2 - bubble sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize + textGap, fontSize, FONT_COLOR);
-		DrawText("KEY_3 - insertion sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*2 + textGap*2, fontSize, FONT_COLOR);
-		DrawText("KEY_4 - shaker sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*3 + textGap*3, fontSize, FONT_COLOR);
-		DrawText("KEY_5 - iterative merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*4 + textGap*4, fontSize, FONT_COLOR);
-		DrawText("KEY_6 - recursive merge sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*5 + textGap*5, fontSize, FONT_COLOR);
-		DrawText("KEY_7 - quick sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*6 + textGap*6, fontSize, FONT_COLOR);
-		DrawText("KEY_8 - heap sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*7 + textGap*7, fontSize, FONT_COLOR);
-		DrawText("KEY_9 - radix sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*8 + textGap*8, fontSize, FONT_COLOR);
-		DrawText("KEY_Q - stop current sort", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*9 + textGap*9, fontSize, FONT_COLOR);
-		DrawText("KEY_N - generate a new matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*10 + textGap*10, fontSize, FONT_COLOR);
-		DrawText("KEY_T - generate a triangle matrix", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*11 + textGap*11, fontSize, FONT_COLOR);
-		DrawText("KEY_ENTER - close control sheet", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*12 + textGap*12, fontSize, FONT_COLOR);
-		DrawText("KEY_ESC - close application", sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize*13 + textGap*13, fontSize, FONT_COLOR);
+		for(int i = 0; i <= 13; i++) {
+		    DrawText(controls[i+1], sheetMarginX + frameMargin + textMarginX, sheetMarginY + frameMargin + textMarginY + fontSize * i + textGap * i, fontSize, FONT_COLOR);  
+		}
 	    }
 	 
 	EndDrawing();
