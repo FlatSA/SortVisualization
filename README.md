@@ -1,6 +1,6 @@
-# Sort Visualization. Runnig with Raylib (https://www.raylib.com)
-
 # WARNING: PHOTOSENSITIVITY/EPILEPSY SEIZURES
+
+# Sort Visualization. Runnig with Raylib (https://www.raylib.com)
 
 ![](images/readme2.png)
 
