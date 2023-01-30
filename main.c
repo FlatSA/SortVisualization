@@ -19,7 +19,6 @@ static const int screenWidth = 1350;
 static const int screenHeight = 680;
 static const int max = 550;
 static const int min = 5;
-static const int shift = 1;
 static const int heightPar = 1; 
 static const int startX = 45;
 static const int startY = 570;
@@ -44,8 +43,9 @@ static const int textGap = 6;
 static const int titleMarginX = 125;
 static const int titleMarginY = 40;
 static const int titleFontSize = 25;
-static const int maxSize = 420;
+static const int maxSize = 1260;
 static const int minSize = 20;
+static int	 shift = 1;
 static int	 triangleGap = 12;
 static int	 unitWidth = 50; 
 static double	 showControlSheet = false;
@@ -86,7 +86,7 @@ static int	DuringSort = 0;
 //Time Interval Variables
 //--------------------------------------------------------------------------------------------------|
 static double	maxInterval = 4.000;
-static double	minInterval = 0.0015;
+static double	minInterval = 0.000;
 static double	deltaTime = 0;
 static double	stateTime = 0;
 static double	timeInterval = 0.900;
@@ -200,8 +200,12 @@ int main(void) {
 		//Generate Triangle Matrix
 		case KEY_T: 
 		    FreeSpace(mat, boxes, size);
-		    triangleGap = AdjustTriangleGap(size, min, max);
-		    mat = GenerateTriangleMat(size, triangleGap); 
+		    if(size < 540) {
+			triangleGap = AdjustTriangleGap(size, min, max);
+			mat = GenerateTriangleMat(size, triangleGap); 
+		    } else {
+			mat = GenerateMat(size, max, min);
+		    }
 		    boxes = GenerateBoxes(size, mat, unitWidth, shift, heightPar, startX, startY);
 		    Input = 0;
 		    break;
@@ -224,7 +228,8 @@ int main(void) {
 		case KEY_FOUR:
 		    DrawShakerSort = true;
 		    pthread_create(&sort_thread, NULL, ShakerSortAlgo, NULL);
-		    break; //Begin Merge Sort
+		    break; 
+		//Begin Merge Sort
 		case KEY_FIVE:
 		    DrawItMergeSort = true;
 		    pthread_create(&sort_thread, NULL, ItMergeSortAlgo, NULL);
@@ -270,10 +275,9 @@ int main(void) {
 		    break; 
 		//Close Control Sheet 
 		case KEY_ENTER: 
-		    showControlSheet = (showControlSheet)? false : true;
+		    showControlSheet = !showControlSheet;
 	    }
 	}
-
 	
 	//Draw Section
 	//----------------------------------------------------------------------------------------------|
@@ -286,11 +290,11 @@ int main(void) {
 	    for (int i = 0; i < size; i++) {
 		DrawRectangleRec(*boxes[i], UNIT_COLOR);
 	    } 
-	    pthread_mutex_unlock(&var_mutex);
 
 	    //Drawing size of matrix
 	    sprintf(size_str, "%d", size);
 	    DrawText(size_str, 10, 15, 12, FONT_COLOR);
+	    pthread_mutex_unlock(&var_mutex);
 
 	    //Sort Iteration Section 
 	    //-------------------------------------------------------------------------------------------------------------------|
@@ -300,14 +304,17 @@ int main(void) {
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(currentTarget, LIGHT_YELLOW_COLOR, unitGap, boxes);
 		DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
-		if(timeInterval < 0.06) DrawOutLine(iterator - 1, LIGHT_WHITE_COLOR, unitGap, boxes);
-		if(iterator < size) DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
+		if(timeInterval < 0.06) 
+		    DrawOutLine(iterator - 1, LIGHT_WHITE_COLOR, unitGap, boxes);
+		if(iterator < size) 
+		    DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
 	    //Bubble Sort Draw Section
 	    else if(DrawBubbleSort) {
 		pthread_mutex_lock(&var_mutex);
-		if(startPoint != 0) DrawOutLine(size - 1 - startPoint, GREEN_COLOR, unitGap, boxes);
+		if(startPoint != 0) 
+		    DrawOutLine(size - 1 - startPoint, GREEN_COLOR, unitGap, boxes);
 		DrawOutLine(iterator + 1, LIGHT_WHITE_COLOR, unitGap, boxes);
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
@@ -318,15 +325,19 @@ int main(void) {
 		pthread_mutex_lock(&var_mutex);
 		DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
 		DrawOutLine(iterator+1, LIGHT_WHITE_COLOR, unitGap, boxes);
-		if(iterator != -1) DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
+		if(iterator != -1) 
+		    DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
 	    //ShakerSort
 	    else if(DrawShakerSort) {
 		pthread_mutex_lock(&var_mutex);
-		if(startPoint != 0) DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
-		if(endPoint != size - 1) DrawOutLine(endPoint, GREEN_COLOR, unitGap, boxes);
-		if(iterator != size - 1) DrawOutLine(iterator+1, LIGHT_WHITE_COLOR, unitGap, boxes);	
+		if(startPoint != 0) 
+		    DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
+		if(endPoint != size - 1) 
+		    DrawOutLine(endPoint, GREEN_COLOR, unitGap, boxes);
+		if(iterator != size - 1) 
+		    DrawOutLine(iterator+1, LIGHT_WHITE_COLOR, unitGap, boxes);	
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
 	    }
@@ -358,13 +369,15 @@ int main(void) {
 		    end = i * 2;
 		    if(j%2 == 0) { 
 			for(; i <= end; i++) {
-			    if(i >= startPoint) break;
+			    if(i >= startPoint) 
+				break;
 			    DrawOutLine(i, LIGHT_PINK_COLOR, unitGap, boxes);
 			} 
 		    }
 		    j++;
 		}
-		if(startPoint < size) DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
+		if(startPoint < size) 
+		    DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
 		DrawOutLine(heap_parent, LIGHT_WHITE_COLOR, unitGap, boxes);
 		DrawOutLine(heap_child, LIGHT_WHITE_COLOR, unitGap, boxes);
 		pthread_mutex_unlock(&var_mutex);
@@ -374,7 +387,8 @@ int main(void) {
 		pthread_mutex_lock(&var_mutex);
 		if(showIndex) {
 		    for(int i = 1; i < 10; i++)
-			if(countInd[i] < size) DrawOutLine(countInd[i], LIGHT_YELLOW_COLOR, unitGap, boxes);
+			if(countInd[i] < size) 
+			    DrawOutLine(countInd[i], LIGHT_YELLOW_COLOR, unitGap, boxes);
 		    DrawOutLine(chIn, LIGHT_WHITE_COLOR, unitGap, boxes);
 		    DrawOutLine(frIn, LIGHT_WHITE_COLOR, unitGap, boxes);
 		} else {
@@ -397,12 +411,12 @@ int main(void) {
 	    //Matrix Size Control
 	    if(!initDraw) {
 		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - (double)sliderGap)/2, 
-							sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
-		if(size  != (int)sizeScale) {
+			       sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
+		if(size != (int)sizeScale) {
 		    size = (int)sizeScale;
-		    if(size > 200) { 
+		    if(size > 250) { 
 			double per = timeScale/(maxInterval - minInterval); 
-			maxInterval = 0.100; 
+			maxInterval = 0.500; 
 			timeScale = per*(maxInterval - minInterval); 
 			timeInterval = maxInterval - timeScale; 
 		    } else { 
@@ -410,6 +424,11 @@ int main(void) {
 			maxInterval = 4.000; 
 			timeScale = per*(maxInterval - minInterval); 
 			timeInterval = maxInterval - timeScale; 
+		    }
+		    if(size > 620) {
+			shift = 0;
+		    } else {
+			shift = 1;
 		    }
 		    memoryFreeFlag = SubCopyMat(size, currentSize, mat, max, min); 	
 		    free(mat);
