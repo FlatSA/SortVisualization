@@ -1023,17 +1023,17 @@ static int MergeSortRec(int l, int r) {
 	int res;
 
 	res = MergeSortRec(l, md);
-	if(res == -1) return - 1;
+	if(res == -1) return -1;
 	res = MergeSortRec(md+1, r);
 	if(res == -1) return -1;
 	res = Merge(l, md, r);
-	if(res == -1) return - 1;
+	if(res == -1) return -1;
     }
     return 0;
 }
 
 static void *RecMergeSortAlgo() {
-    MergeSortRec(0, size-1); 
+    MergeSortRec(0, size - 1); 
     Reset();
     return NULL;
 }
@@ -1070,7 +1070,7 @@ static int Partition(int low, int high) {
 
     initDraw = true;
 
-    for(int j = low; j<=high - 1; j++) {
+    for(int j = low; j <= high - 1; j++) {
 
 	pthread_mutex_lock(&var_mutex);
 	iterator = j;
@@ -1102,7 +1102,7 @@ static int Partition(int low, int high) {
     }
 
     pthread_mutex_lock(&var_mutex);
-    Swap(boxes, mat, i+1, high);
+    Swap(boxes, mat, i + 1, high);
     pthread_mutex_unlock(&var_mutex);
 
     if(stopSorting) return (-1);
@@ -1110,7 +1110,7 @@ static int Partition(int low, int high) {
     SetDelta();
     nanosleep(&delta, &delta);
 
-    return (i+1);
+    return i + 1;
 }
 
 static void swap(int* a, int* b) {
@@ -1123,8 +1123,8 @@ static int Heapify(int N, int i) {
     initDraw = true;
     
     int largest = i;
-    int left = 2*i + 1;
-    int right = 2*i + 2;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
 
     if(left < N && mat[left] > mat[largest])
 	largest = left;
