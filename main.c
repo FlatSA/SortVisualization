@@ -411,7 +411,12 @@ int main(void) {
 			   sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
 	    if(size != (int)sizeScale) {
 		size = (int)sizeScale;
-		if(size > 250) { 
+		if(size > 800) {
+		    double per = timeScale/(maxInterval - minInterval); 
+		    maxInterval = 0.050; 
+		    timeScale = per*(maxInterval - minInterval); 
+		    timeInterval = maxInterval - timeScale; 
+		} else if(size > 250) { 
 		    double per = timeScale/(maxInterval - minInterval); 
 		    maxInterval = 0.500; 
 		    timeScale = per*(maxInterval - minInterval); 
