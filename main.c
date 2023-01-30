@@ -165,7 +165,6 @@ static int	Heapify(int N, int i);
 static int	Pow(int i, int j);
 static void	*RadixSortAlgo();
 static int	CountSort(int exp);
-static int	getMax();
 
 int main(void) {
 
@@ -391,13 +390,13 @@ int main(void) {
 	    //Time Interval Control
 	    DrawLine(panelStartX, panelStartY, panelWidth, panelStartY, UNIT_COLOR);
 	    DrawRectangle(panelStartX, panelStartY, panelWidth, panelHeight, PANEL_COLOR); 
-	    timeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, sliderWidth, sliderHeight}, "delay", NULL, timeScale, minInterval, maxInterval);
+	    timeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + (panelHeight - 2*sliderHeight - (double)sliderGap)/2, sliderWidth, sliderHeight}, "delay", NULL, timeScale, minInterval, maxInterval);
 	    timeInterval = maxInterval - timeScale;
 	    DrawRectangle(sliderMargin + sliderWidth - 10, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2 - 2, 2, sliderHeight + 4, UNIT_COLOR);
 	    
 	    //Matrix Size Control
 	    if(!initDraw) {
-		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - sliderGap)/2, 
+		sizeScale = GuiSliderBar((Rectangle){sliderMargin, panelStartY + sliderGap + sliderHeight + (panelHeight - 2*sliderHeight - (double)sliderGap)/2, 
 							sliderWidth, sliderHeight}, "size", NULL, sizeScale, minSize, maxSize);
 		if(size  != (int)sizeScale) {
 		    size = (int)sizeScale;
@@ -423,7 +422,7 @@ int main(void) {
 	    }
 
 	    //Control Sheet Button 
-	    if(GuiButton((Rectangle){sliderMargin + sliderWidth + buttonMargin, panelStartY + (panelHeight - 2*sliderHeight - sliderGap)/2, 
+	    if(GuiButton((Rectangle){sliderMargin + sliderWidth + buttonMargin, panelStartY + (panelHeight - 2*sliderHeight - (double)sliderGap)/2, 
 					buttonWidth, sliderHeight*2 + sliderGap}, "Show Control Sheet (Press ENTER)")) { 
 		showControlSheet = (!showControlSheet)? true : false;
 	    }
@@ -544,7 +543,7 @@ static void *SelectionSortAlgo() {
 	    pthread_mutex_lock(&var_mutex);
 	    Swap(boxes, mat, currentTarget, startPoint);
 	    pthread_mutex_unlock(&var_mutex);
-			
+    	
 	    if(stopSorting) { 
 		Reset();
 		return NULL;	
