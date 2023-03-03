@@ -9,15 +9,12 @@ int* GenerateMat(int size, int max, int min) {
 	srand(time(0));
 	int* mat = malloc(size * sizeof(int));        
 	for(int i = 0; i < size; i++) {
-		mat[i] = (rand()%(max - min + 1) + min);
+		mat[i] = (rand() % (max - min + 1) + min);
 	}
 	return mat;
 }
 
 int* SubCopyMat(int newSize, int currentSize, int* currentMat, int max, int min) {
-	if(currentSize == newSize) 
-	    return currentMat;
-
 	if(newSize < currentSize) {
 	    int* newMat = malloc(newSize * sizeof(int));
 	    for(int i = 0; i < newSize; i++) {
@@ -31,10 +28,12 @@ int* SubCopyMat(int newSize, int currentSize, int* currentMat, int max, int min)
 		    newMat[i] = currentMat[i];
 	    }
 	    for(int j = currentSize; j < newSize; j++) {
-		    newMat[j] = (rand()%(max - min + 1) + min);
+		    newMat[j] = (rand() % (max - min + 1) + min);
 	    }
 	    return newMat;
 	}	
+
+	return currentMat;
 }
 
 int* GenerateTriangleMat(int size, int gap) {
@@ -46,7 +45,7 @@ int* GenerateTriangleMat(int size, int gap) {
 	int j;
 	int swapFlag;
 	for(int i = 0; i < size; i++) {
-		j = (rand()%(size));
+		j = rand() % size;
 		if(j != i) {
 			swapFlag = mat[j]; 
 			mat[j] = mat[i];
@@ -56,11 +55,11 @@ int* GenerateTriangleMat(int size, int gap) {
 	return mat;
  }
 
-struct Rectangle** GenerateBoxes(int size, int*mat, int width, int shift, int hPar, int sX, int sY) {
+struct Rectangle** GenerateBoxes(int size, int* mat, int width, int shift, int hPar, int sX, int sY) {
 	struct Rectangle** boxes = malloc(size * sizeof(Rectangle*));
 	for(int i = 0; i < size; i++) {
 		boxes[i] = malloc(size * sizeof(Rectangle)); 
-		boxes[i]->x = sX + (width + shift)*i;
+		boxes[i]->x = sX + (width + shift) * i;
 		boxes[i]->y = sY - mat[i] * hPar;
 		boxes[i]->width = width;
 		boxes[i]->height = mat[i] * hPar;
@@ -89,8 +88,8 @@ void FreeBoxes(struct Rectangle** boxes, int size) {
 void DrawOutLine(int index, Color color, int edge, struct Rectangle** boxes) {
 	int posX = boxes[index]->x - edge;
 	int posY = boxes[index]->y /* - edge */;
-	int width = boxes[index]->width + edge*2;
-	int height = boxes[index]->height + edge*1 /* *2 */;
+	int width = boxes[index]->width + edge * 2;
+	int height = boxes[index]->height + edge * 1 /* *2 */;
 	DrawRectangle(posX, posY, width, height, color);
 }
 
@@ -112,10 +111,10 @@ void Swap(struct Rectangle** boxes, int* mat, int index1, int index2) {
 }
 
 int AdjustUnitWidth(int screenWidth, int startX, int shift, int size) {
-	int width = ((screenWidth - 2 * startX) - shift*(size - 1)) / size;
+	int width = ((screenWidth - 2 * startX) - shift * (size - 1)) / size;
 	return width;
 }
 
 int AdjustTriangleGap(int size, int min, int max) {
-	return (max - min)/size;
+	return (max - min) / size;
 }

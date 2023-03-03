@@ -49,7 +49,7 @@ static int	 shift = 1;
 static int	 triangleGap = 12;
 static int	 unitWidth = 50; 
 static double	 showControlSheet = false;
-static const char *controls[] = {
+static const char* controls[] = {
 	"Control Sheet", 
 	"KEY_1 - selection sort",
 	"KEY_2 - bubble sort", 
@@ -71,8 +71,8 @@ static const char *controls[] = {
 static int	size = 40;
 static double	sizeScale = 40;
 static int	currentSize = 40; 
-static int      *mat; 
-static int      *memoryFreeFlag; 
+static int*     mat; 
+static int*     memoryFreeFlag; 
 static char	size_str[10];
 
 static struct Rectangle** boxes;
@@ -142,21 +142,21 @@ static int	Min(int x, int y);
 static void	Reset();
 static void	ThreadSleep();
 static void	ThreadWake();
-static void	*SelectionSortAlgo();
-static void	*BubbleSortAlgo();
-static void	*InsertionSortAlgo();
-static void	*ShakerSortAlgo();
-static void	*ItMergeSortAlgo();
-static void	*RecMergeSortAlgo();
+static void*	SelectionSortAlgo();
+static void*	BubbleSortAlgo();
+static void*	InsertionSortAlgo();
+static void*	ShakerSortAlgo();
+static void*	ItMergeSortAlgo();
+static void*	RecMergeSortAlgo();
 static int	MergeSortRec(int l, int r);
 static int	Merge(int l, int m, int r);
-static void	*QuickSortAlgo();
+static void*	QuickSortAlgo();
 static int	QuickSortRec(int low, int high);
 static int	Partition(int low, int high);
-static void	*HeapSortAlgo();
+static void*	HeapSortAlgo();
 static int	Heapify(int N, int i);
 static int	Pow(int base, int power);
-static void	*RadixSortAlgo();
+static void*	RadixSortAlgo();
 static int	CountSort(int exp);
 
 int main(void) {
@@ -508,7 +508,7 @@ static void SetDelta() {
     pthread_mutex_unlock(&var_mutex);
 }
 
-static void *SelectionSortAlgo() {
+static void* SelectionSortAlgo() {
     initDraw = true;
     
     int st;
@@ -563,7 +563,7 @@ static void *SelectionSortAlgo() {
     return NULL;
 }
 
-static void *BubbleSortAlgo() {
+static void* BubbleSortAlgo() {
     initDraw = true;
     int st;
     int i;
@@ -602,7 +602,7 @@ static void *BubbleSortAlgo() {
     return NULL;
 }
 
-static void *InsertionSortAlgo() {
+static void* InsertionSortAlgo() {
     int height;
     int y;
     int key;
@@ -658,7 +658,7 @@ static void *InsertionSortAlgo() {
     return NULL;
 }
 
-static void *ShakerSortAlgo() {
+static void* ShakerSortAlgo() {
     bool swapped = true;
     int strP = 0;
     int endP = size - 1;
@@ -752,7 +752,7 @@ static int Min(int x, int y) {
     return (x < y) ? x : y;
 }
 
-static void *ItMergeSortAlgo() {
+static void* ItMergeSortAlgo() {
     int curr_size;
     int ls;
     int re;
@@ -1044,13 +1044,13 @@ static int MergeSortRec(int l, int r) {
     return 0;
 }
 
-static void *RecMergeSortAlgo() {
+static void* RecMergeSortAlgo() {
     MergeSortRec(0, size - 1); 
     Reset();
     return NULL;
 }
 
-static void *QuickSortAlgo() {
+static void* QuickSortAlgo() {
     QuickSortRec(0, size - 1);
     Reset();
     return NULL;
@@ -1168,7 +1168,7 @@ static int Heapify(int N, int i) {
     return 0;
 }
 
-static void *HeapSortAlgo() {
+static void* HeapSortAlgo() {
     int res;
     int N = size;
     pthread_mutex_lock(&var_mutex);
@@ -1316,7 +1316,7 @@ static int CountSort(int exp) {
 } 
 
 
-static void *RadixSortAlgo() {
+static void* RadixSortAlgo() {
     initDraw = true;
     int m = getMax(size);
     int res = 0;
