@@ -302,7 +302,7 @@ int main(void) {
 	if(DrawSelectionSort) {
 	    DrawOutLine(currentTarget, LIGHT_YELLOW_COLOR, unitGap, boxes);
 	    DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
-	    if(timeInterval < 0.06) {
+	    if(iterator > 0 && iterator < size && timeInterval < 0.06) {
 		DrawOutLine(iterator - 1, LIGHT_WHITE_COLOR, unitGap, boxes);
 	    }
 	    if(iterator < size) { 
