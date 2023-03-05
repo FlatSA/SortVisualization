@@ -310,7 +310,7 @@ int main(void) {
 	//InsertionSort 
 	else if(DrawInsertionSort) {	
 	    DrawOutLine(startPoint, GREEN_COLOR, unitGap, boxes);
-	    DrawOutLine(iterator+1, LIGHT_WHITE_COLOR, unitGap, boxes);
+	    DrawOutLine(iterator + 1, LIGHT_WHITE_COLOR, unitGap, boxes);
 	    if(iterator != -1) {
 		DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 	    }
@@ -324,7 +324,7 @@ int main(void) {
 		DrawOutLine(endPoint, GREEN_COLOR, unitGap, boxes);
 	    }
 	    if(iterator != size - 1) {
-		DrawOutLine(iterator+1, LIGHT_WHITE_COLOR, unitGap, boxes);	
+		DrawOutLine(iterator + 1, LIGHT_WHITE_COLOR, unitGap, boxes);	
 	    }
 	    DrawOutLine(iterator, LIGHT_WHITE_COLOR, unitGap, boxes);
 	}
